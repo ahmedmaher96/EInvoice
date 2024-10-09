@@ -5,26 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EInvoice.DAL.Models
+namespace EInvoice.BLL.DTO
 {
-    public class Tax
+    public class TaxDTO
     {
         #region Properties
-
-        [Key]
-        public int TaxID { get; set; }
 
         [Required(ErrorMessage = "Tax Name is required")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Code is required")]
         public string TaxCode { get; set; }
-
-        #region Navigational Properties
-
-        public ICollection<ItemTax> ItemTaxes { get; set; }
-
-        #endregion
 
         #endregion
     }

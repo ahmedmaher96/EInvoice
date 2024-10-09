@@ -52,7 +52,6 @@ namespace EInvoice.DAL.Context
             {
                 entity.HasKey(t => t.TaxID);
                 entity.Property(t => t.Name).IsRequired().HasMaxLength(50);
-                entity.Property(t => t.TaxAmount).HasColumnType("decimal(18,2)");
 
                 entity.HasMany(t => t.ItemTaxes)
                         .WithOne(it => it.Tax)
@@ -64,7 +63,8 @@ namespace EInvoice.DAL.Context
             {
                 // Configure composite primary key
                 entity.HasKey(it => it.ItemTaxID);
-                
+                entity.Property(t => t.TaxAmount).HasColumnType("decimal(18,2)");
+
                 entity.HasOne(it => it.Item)
                       .WithMany(i => i.ItemTaxes)
                       .HasForeignKey(it => it.ItemId);

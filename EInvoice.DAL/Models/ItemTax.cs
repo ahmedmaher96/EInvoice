@@ -17,6 +17,8 @@ namespace EInvoice.DAL.Models
         public int TaxId { get; set; }
         public Tax Tax { get; set; }
 
+        public decimal TaxAmount { get; set; }
+
         #endregion
     }
 }

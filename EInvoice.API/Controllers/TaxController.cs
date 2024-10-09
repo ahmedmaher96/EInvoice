@@ -8,11 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EInvoice.API.Controllers
 {
-    public class ItemController : GenericController<Item, ItemDTO>
+    public class TaxController : GenericController<Tax, TaxDTO>
     {
         #region Constructors
 
-        public ItemController(IGenericHandler<Item, ItemDTO> handler, IMapper mapper)
+        public TaxController(IGenericHandler<Tax, TaxDTO> handler, IMapper mapper)
             : base(handler, mapper)
         {
 

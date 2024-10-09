@@ -8,14 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EInvoice.API.Controllers
 {
-    public class ItemController : GenericController<Item, ItemDTO>
+    public class CustomerController : GenericController<Customer, CustomerDTO>
     {
         #region Constructors
 
-        public ItemController(IGenericHandler<Item, ItemDTO> handler, IMapper mapper)
+        public CustomerController(IGenericHandler<Customer, CustomerDTO> handler, IMapper mapper)
             : base(handler, mapper)
         {
-
+            
         }
 
         #endregion

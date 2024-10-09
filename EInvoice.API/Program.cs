@@ -1,5 +1,6 @@
 
 using EInvoice.API.Helpers;
+using EInvoice.BLL.Handlers;
 using EInvoice.BLL.Interfaces.IGeneric;
 using EInvoice.BLL.Repositries.Generic;
 using EInvoice.DAL.Context;
@@ -20,6 +21,7 @@ namespace EInvoice.API
                 Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
             builder.Services.AddScoped(typeof(IGenericRepositry<>), typeof(GenericRepositries<>));
+            builder.Services.AddScoped(typeof(IGenericHandler<,>), typeof(GenericHandler<,>));
             builder.Services.AddAutoMapper(typeof(MappingProfiles));
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

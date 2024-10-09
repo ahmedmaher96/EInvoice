@@ -21,7 +21,7 @@ namespace EInvoice.DAL.Models
         public int Quantity { get; set; }
         public decimal TotalAmount => Quantity * Amount;
 
-        public decimal TotalTaxes => Item.ItemTaxes?.Sum(i => i.Tax.TaxAmount) ?? 0;
+        public decimal TotalTaxes => Item.ItemTaxes?.Sum(i => i.TaxAmount) ?? 0;
 
         public decimal TotalNetAmout => TotalAmount + TotalTaxes;
 
