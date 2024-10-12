@@ -40,7 +40,7 @@ namespace EInvoice.DAL.Context
             {
                 entity.HasKey(i => i.ItemID);
                 entity.Property(i => i.Name).IsRequired().HasMaxLength(100);
-                entity.Property(i => i.ItemCode).IsRequired();
+                entity.Property(i => i.Code).IsRequired();
 
                 entity.HasMany(i => i.ItemTaxes)
                         .WithOne(it => it.Item)
@@ -52,6 +52,7 @@ namespace EInvoice.DAL.Context
             {
                 entity.HasKey(t => t.TaxID);
                 entity.Property(t => t.Name).IsRequired().HasMaxLength(50);
+                entity.Property(i => i.Code).IsRequired();
 
                 entity.HasMany(t => t.ItemTaxes)
                         .WithOne(it => it.Tax)
@@ -79,6 +80,7 @@ namespace EInvoice.DAL.Context
             {
                 entity.HasKey(c => c.CustomerID);
                 entity.Property(c => c.Name).IsRequired().HasMaxLength(100);
+                entity.Property(i => i.Code).IsRequired();
             });
 
             // EInvoice

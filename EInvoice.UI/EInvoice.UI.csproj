@@ -15,4 +15,10 @@
     <ProjectReference Include="..\EInvoice.BLL\EInvoice.BLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Components\ItemComponents\ItemList.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 </Project>

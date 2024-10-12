@@ -21,17 +21,17 @@ namespace EInvoice.BLL.Handlers
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Tmodel>> GetItems(string? filter)
+        public async Task<IEnumerable<Tmodel>> GetElements(string? filterCode, string? filterName)
         {
             IEnumerable<Tmodel> Entities;
 
-            if (filter == null)
+            if (filterCode == null && filterName == null)
             {
                 Entities = await _repository.GetAllAsync();
             }
             else
             {
-                Entities = await _repository.GetList(filter);
+                Entities = await _repository.GetList(filterCode, filterName);
                 if (Entities == null || !Entities.Any())
                 {
                     throw new Exception("Not Found");

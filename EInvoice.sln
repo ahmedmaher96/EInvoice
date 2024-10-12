@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EInvoice.UI", "EInvoice.UI\EInvoice.UI.csproj", "{8027BC98-8250-4560-BF89-DA938CCAE4CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EInvoice.UI", "EInvoice.UI\EInvoice.UI.csproj", "{8027BC98-8250-4560-BF89-DA938CCAE4CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EInvoice.DAL", "EInvoice.DAL\EInvoice.DAL.csproj", "{DA9F9A61-3146-4F2C-A35A-267D9B0BF74B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EInvoice.DAL", "EInvoice.DAL\EInvoice.DAL.csproj", "{DA9F9A61-3146-4F2C-A35A-267D9B0BF74B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EInvoice.BLL", "EInvoice.BLL\EInvoice.BLL.csproj", "{CABD590E-9813-491A-814E-0BFCF8F7A56E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EInvoice.BLL", "EInvoice.BLL\EInvoice.BLL.csproj", "{CABD590E-9813-491A-814E-0BFCF8F7A56E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EInvoice.API", "EInvoice.API\EInvoice.API.csproj", "{12913351-A8DE-403D-9982-459A1C50BA55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EInvoice.API", "EInvoice.API\EInvoice.API.csproj", "{12913351-A8DE-403D-9982-459A1C50BA55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

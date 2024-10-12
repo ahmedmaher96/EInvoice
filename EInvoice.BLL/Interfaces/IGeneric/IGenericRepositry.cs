@@ -15,7 +15,7 @@ namespace EInvoice.BLL.Interfaces.IGeneric
         void Delete(int id);
         Task<T> GetByIdAsync(int id);
         Task<IEnumerable<T>> GetAllAsync();
-        Task<IEnumerable<T>> GetList(string filter);
+        Task<IEnumerable<T>> GetList(string filterCode, string filterName);
 
     }
 }

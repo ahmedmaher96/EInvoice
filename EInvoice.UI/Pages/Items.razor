@@ -1,0 +1,85 @@
+﻿@page "/Item"
+@inject HttpClient Http
+
+<div class="row my-2">
+    <div class="col-md-8">
+        <h3>Items</h3>
+    </div>
+    <div class="col-md-4 text-end">
+        <a class="btn btn-success">
+            <i class="bi bi-file-earmark-plus-fill"></i> Add Item
+        </a>
+    </div>
+</div>
+
+<div class="container my-3">
+    <EditForm Model="@searchParameters" OnValidSubmit="HandleSearch">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="my-2">
+            <InputText @bind-Value="searchParameters.Code" class="form-control" placeholder="Item Code">
+            </InputText>
+        </div>
+        <div class="my-2">
+            <InputText @bind-Value="searchParameters.Name" class="form-control" placeholder="Item Name">
+            </InputText>
+        </div>
+        <div class="my-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Search
+            </button>
+        </div>
+    </EditForm>
+</div>
+
+@if (items != null)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Item Code</th>
+                <th>Item Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            @foreach (var item in items)
+            {
+                <ItemList ItemCode="@item.Code" ItemName="@item.Name"></ItemList>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="h3 alert alert-warning">There are no item yet ..</p>
+}
+
+@code {
+    private List<Item> items = new List<Item>();
+    private SearchParameters searchParameters = new SearchParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchItems();
+    }
+
+    private async Task HandleSearch()
+    {
+        await FetchItems();
+    }
+
+    private async Task FetchItems()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<List<Item>>($"api/Item?filterCode={searchParameters.Code}&filterName={searchParameters.Name}");
+            items = response ?? new List<Item>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching items: {ex.Message}");
+            items = new List<Item>();
+        }
+    }
+}

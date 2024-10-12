@@ -18,7 +18,7 @@ namespace EInvoice.DAL.Models
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Code is required")]
-        public string ItemCode { get; set; }
+        public string Code { get; set; }
 
         #region Navigational Properties
 

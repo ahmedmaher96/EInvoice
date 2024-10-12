@@ -29,9 +29,9 @@ namespace EInvoice.API.Controllers.Generic
         #region Actions
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TModel>>> GetItems(string? filter = null)
+        public async Task<ActionResult<IEnumerable<TModel>>> GetElements([FromQuery] string? filterCode = null, string? filterName = null)
         {
-            IEnumerable<TModel> Entities = await _handler.GetItems(filter);
+            IEnumerable<TModel> Entities = await _handler.GetElements(filterCode, filterName);
             if (Entities == null || !Entities.Any())
             {
                 return NotFound("No items found.");

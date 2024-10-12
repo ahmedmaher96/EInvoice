@@ -23,6 +23,15 @@ namespace EInvoice.API
             builder.Services.AddScoped(typeof(IGenericRepositry<>), typeof(GenericRepositries<>));
             builder.Services.AddScoped(typeof(IGenericHandler<,>), typeof(GenericHandler<,>));
             builder.Services.AddAutoMapper(typeof(MappingProfiles));
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -47,6 +56,8 @@ namespace EInvoice.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseCors("AllowAllOrigins");
 
             app.UseAuthorization();
 

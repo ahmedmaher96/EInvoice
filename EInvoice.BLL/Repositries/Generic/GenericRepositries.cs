@@ -40,10 +40,11 @@ namespace EInvoice.BLL.Repositries.Generic
             return await Query().ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> GetList(string filter)
+        public async Task<IEnumerable<T>> GetList(string filterCode, string filterName)
         {
             return await Query()
-                        .Where(e => EF.Property<string>(e, "Name").Contains(filter))
+                        .Where(e => EF.Property<string>(e, "Name").Contains(filterName) 
+                        || EF.Property<string>(e, "Code").Contains(filterCode))
                         .ToListAsync();
         }
         public async Task<T> GetByIdAsync(int id)
