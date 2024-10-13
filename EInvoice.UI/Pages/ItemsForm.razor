@@ -1,0 +1,51 @@
+﻿@page "/Item/Form"
+@inject HttpClient Http
+
+<h3>ItemsForm</h3>
+
+<div class="container my-5">
+    <EditForm Model="@_item" OnValidSubmit="SendData">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="my-3">
+            <InputText @bind-Value="_item.Code" class="form-control" placeholder="Item Code" />
+        </div>
+        <div class="my-3">
+            <InputText @bind-Value="_item.Name" class="form-control" placeholder="Item Name" />
+        </div>
+        <div class="my-3">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-file-earmark-plus-fill"></i> Save
+            </button>
+            <NavLink href="/Item" class="btn btn-secondary">
+                <i class="bi bi-arrow-return-right"></i> Return Back
+            </NavLink>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    private ItemDTO _item = new ItemDTO();
+
+    private async Task SendData()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/Item/Form", _item);
+            if (response.IsSuccessStatusCode)
+            {
+                var newItem = await response.Content.ReadFromJsonAsync<ItemDTO>();
+            }
+            else
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error: {errorMessage}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving item: {ex.Message}");
+        }
+    }
+
+}

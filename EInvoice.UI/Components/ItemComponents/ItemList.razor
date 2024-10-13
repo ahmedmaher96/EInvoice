@@ -2,10 +2,10 @@
     <td>@ItemCode</td>
     <td>@ItemName</td>
     <td>
-        <a class="btn btn-outline-warning">
+        <a class="btn btn-outline-warning" @onclick="() => OnEdit.InvokeAsync(ItemID)">
             <i class="bi bi-pencil-square"></i>
         </a>
-        <a class="btn btn-outline-danger">
+        <a class="btn btn-outline-danger" @onclick="() => OnDelete.InvokeAsync(ItemID)">
             <i class="bi bi-trash"></i>
         </a>
     </td>
@@ -16,4 +16,11 @@
     public string ItemName { get; set; }
     [Parameter]
     public string ItemCode { get; set; }
+    [Parameter]
+    public int ItemID { get; set; }
+    [Parameter]
+    public EventCallback<int> OnDelete { get; set; }
+    [Parameter]
+    public EventCallback<int> OnEdit { get; set; }
+
 }

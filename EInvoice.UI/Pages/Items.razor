@@ -6,16 +6,14 @@
         <h3>Items</h3>
     </div>
     <div class="col-md-4 text-end">
-        <a class="btn btn-success">
+        <NavLink href="/Item/Form" class="btn btn-success">
             <i class="bi bi-file-earmark-plus-fill"></i> Add Item
-        </a>
+        </NavLink>
     </div>
 </div>
 
 <div class="container my-3">
     <EditForm Model="@searchParameters" OnValidSubmit="HandleSearch">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
         <div class="my-2">
             <InputText @bind-Value="searchParameters.Code" class="form-control" placeholder="Item Code">
             </InputText>
@@ -24,36 +22,42 @@
             <InputText @bind-Value="searchParameters.Name" class="form-control" placeholder="Item Name">
             </InputText>
         </div>
-        <div class="my-2">
+        <div class="my-3">
             <button type="submit" class="btn btn-primary">
                 <i class="bi bi-search"></i> Search
             </button>
         </div>
     </EditForm>
+    <br />
+    <br />
+    @if (items != null)
+    {
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                @foreach (var item in items)
+                {
+                    <ItemList ItemCode="@item.Code"
+                              ItemName="@item.Name"
+                              ItemID="@item.ItemID"
+                              OnEdit="EditItem"
+                              OnDelete="DeleteItem">
+                    </ItemList>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="h3 alert alert-warning">There are no item yet ..</p>
+    }
 </div>
-
-@if (items != null)
-{
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>Item Code</th>
-                <th>Item Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody class="table-group-divider">
-            @foreach (var item in items)
-            {
-                <ItemList ItemCode="@item.Code" ItemName="@item.Name"></ItemList>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p class="h3 alert alert-warning">There are no item yet ..</p>
-}
 
 @code {
     private List<Item> items = new List<Item>();
@@ -82,4 +86,30 @@ else
             items = new List<Item>();
         }
     }
+
+    private async Task DeleteItem(int id)
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"api/Item/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                items = items.Where(i => i.ItemID != id).ToList();
+            }
+            else
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during deletion: {ex.Message}");
+        }
+    }
+
+    private async Task EditItem(int id)
+    {
+        
+    }
+
 }

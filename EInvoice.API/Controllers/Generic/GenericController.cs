@@ -46,8 +46,8 @@ namespace EInvoice.API.Controllers.Generic
             return Ok(Entity);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Save([FromForm] TDto tDto)
+        [HttpPost("Form")]
+        public async Task<IActionResult> Save([FromBody] TDto tDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -56,7 +56,7 @@ namespace EInvoice.API.Controllers.Generic
             return Ok(newItem);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("Form/{id}")]
         public async Task<IActionResult> Update(int id, [FromForm] TDto tDto)
         {
             if (!ModelState.IsValid)
