@@ -1,5 +1,6 @@
 ﻿@page "/Item"
 @inject HttpClient Http
+@inject ItemService itemService
 
 <div class="row my-2">
     <div class="col-md-8">
@@ -46,6 +47,7 @@
                     <ItemList ItemCode="@item.Code"
                               ItemName="@item.Name"
                               ItemID="@item.ItemID"
+                              _singleItem="singleItem"
                               OnEdit="EditItem"
                               OnDelete="DeleteItem">
                     </ItemList>
@@ -61,6 +63,7 @@
 
 @code {
     private List<Item> items = new List<Item>();
+    public Item singleItem { get; set; }
     private SearchParameters searchParameters = new SearchParameters();
 
     protected override async Task OnInitializedAsync()
@@ -107,9 +110,18 @@
         }
     }
 
-    private async Task EditItem(int id)
+    public async Task EditItem(int id)
     {
-        
+        try
+        {
+            singleItem = await Http.GetFromJsonAsync<Item>($"api/Item/Form/{id}");
+
+            itemService.ItemProperty = singleItem;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching items: {ex.Message}");
+        }
     }
 
 }

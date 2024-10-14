@@ -39,7 +39,7 @@ namespace EInvoice.API.Controllers.Generic
             return Ok(Entities);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("Form/{id}")]
         public async Task<ActionResult<TModel>> GetSingle(int id)
         {
             var Entity = await _handler.GetSingle(id);
@@ -57,7 +57,7 @@ namespace EInvoice.API.Controllers.Generic
         }
 
         [HttpPut("Form/{id}")]
-        public async Task<IActionResult> Update(int id, [FromForm] TDto tDto)
+        public async Task<IActionResult> Update(int id, [FromBody] TDto tDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -1,3 +1,4 @@
+using EInvoice.UI.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -13,7 +14,7 @@ namespace EInvoice.UI
 
             //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5173") });
-
+            builder.Services.AddScoped<ItemService>();
             await builder.Build().RunAsync();
         }
     }

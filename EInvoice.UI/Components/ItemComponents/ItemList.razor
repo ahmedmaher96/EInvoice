@@ -2,9 +2,9 @@
     <td>@ItemCode</td>
     <td>@ItemName</td>
     <td>
-        <a class="btn btn-outline-warning" @onclick="() => OnEdit.InvokeAsync(ItemID)">
+        <button class="btn btn-outline-warning" @onclick="NavigateToItemForm">
             <i class="bi bi-pencil-square"></i>
-        </a>
+        </button>
         <a class="btn btn-outline-danger" @onclick="() => OnDelete.InvokeAsync(ItemID)">
             <i class="bi bi-trash"></i>
         </a>
@@ -19,8 +19,19 @@
     [Parameter]
     public int ItemID { get; set; }
     [Parameter]
+    public Item _singleItem { get; set; }
+    [Parameter]
     public EventCallback<int> OnDelete { get; set; }
     [Parameter]
     public EventCallback<int> OnEdit { get; set; }
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    private void NavigateToItemForm()
+    {
+        OnEdit.InvokeAsync(ItemID);
+        NavigationManager.NavigateTo($"/Item/Form/{ItemID}");
+    }
+
 
 }
