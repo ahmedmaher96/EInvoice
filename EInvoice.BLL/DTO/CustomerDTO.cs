@@ -15,7 +15,7 @@ namespace EInvoice.BLL.DTO
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Code is required")]
-        public string CustomerCode { get; set; }
+        public string Code { get; set; }
 
         #endregion
     }

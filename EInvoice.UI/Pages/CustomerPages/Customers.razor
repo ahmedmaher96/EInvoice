@@ -1,0 +1,134 @@
+﻿@page "/Customer"
+@inject HttpClient Http
+@inject GeneralService service
+
+<div class="row my-2">
+    <div class="col-md-8">
+        <h3>Customers</h3>
+    </div>
+    <div class="col-md-4 text-end">
+        <NavLink href="/Customer/Form" class="btn btn-success">
+            <i class="bi bi-file-earmark-plus-fill"></i> Add Customer
+        </NavLink>
+    </div>
+</div>
+
+<div class="container my-3">
+    <EditForm Model="@searchParameters" OnValidSubmit="HandleSearch">
+        <div class="my-2">
+            <InputText @bind-Value="searchParameters.Code" class="form-control" placeholder="Customer Code">
+            </InputText>
+        </div>
+        <div class="my-2">
+            <InputText @bind-Value="searchParameters.Name" class="form-control" placeholder="Customer Name">
+            </InputText>
+        </div>
+        <div class="my-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Search
+            </button>
+        </div>
+    </EditForm>
+    <br />
+    <br />
+    @if (customers != null)
+    {
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Customer Code</th>
+                    <th>Customer Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                @foreach (var customer in customers)
+                {
+                    <CustomerList CustomerCode="@customer.Code"
+                              CustomerName="@customer.Name"
+                              CustomerID="@customer.CustomerID"
+                              _singleCustomer="singleCustomer"
+                              OnEdit="EditCustomer"
+                              OnDelete="DeleteCustomer">
+                    </CustomerList>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="h3 alert alert-warning">There are no customers yet ..</p>
+    }
+</div>
+
+@code {
+    private List<Customer> customers = new List<Customer>();
+    public Customer singleCustomer { get; set; }
+    private SearchParameters searchParameters = new SearchParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchCustomers();
+    }
+
+    private async Task HandleSearch()
+    {
+        await FetchCustomers();
+    }
+
+    private async Task FetchCustomers()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<List<Customer>>($"api/Customer?filterCode={searchParameters.Code}&filterName={searchParameters.Name}");
+            customers = response ?? new List<Customer>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching customers: {ex.Message}");
+            customers = new List<Customer>();
+        }
+    }
+
+    private async Task DeleteCustomer(int id)
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"api/Customer/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                customers = customers.Where(i => i.CustomerID != id).ToList();
+            }
+            else
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during deletion: {ex.Message}");
+        }
+    }
+
+    public async Task EditCustomer(int id)
+    {
+        try
+        {
+            singleCustomer = customers.FirstOrDefault(i => i.CustomerID == id);
+
+            if (singleCustomer == null)
+            {
+                singleCustomer = await Http.GetFromJsonAsync<Customer>($"api/Customer/Form/{id}");
+            }
+
+            service.SetCustomer(singleCustomer!);
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching customers: {ex.Message}");
+        }
+    }
+
+}

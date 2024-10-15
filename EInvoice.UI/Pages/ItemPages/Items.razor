@@ -1,6 +1,6 @@
 ﻿@page "/Item"
 @inject HttpClient Http
-@inject ItemService itemService
+@inject GeneralService service
 
 <div class="row my-2">
     <div class="col-md-8">
@@ -114,9 +114,16 @@
     {
         try
         {
-            singleItem = await Http.GetFromJsonAsync<Item>($"api/Item/Form/{id}");
+            singleItem = items.FirstOrDefault(i => i.ItemID == id);
 
-            itemService.GetItem(singleItem!);
+            if (singleItem == null)
+            {
+                singleItem = await Http.GetFromJsonAsync<Item>($"api/Item/Form/{id}");
+            }
+
+            service.SetItem(singleItem!);
+            StateHasChanged();
+
         }
         catch (Exception ex)
         {

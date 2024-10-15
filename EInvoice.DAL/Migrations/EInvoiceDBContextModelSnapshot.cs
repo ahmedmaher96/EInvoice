@@ -101,6 +101,32 @@ namespace EInvoice.DAL.Migrations
                     b.ToTable("InvoiceItem");
                 });
 
+            modelBuilder.Entity("EInvoice.DAL.Models.InvoiceItemTax", b =>
+                {
+                    b.Property<int>("InvoiceItemTaxID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceItemTaxID"));
+
+                    b.Property<int>("ItemInvoiceID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TaxId")
+                        .HasColumnType("int");
+
+                    b.HasKey("InvoiceItemTaxID");
+
+                    b.HasIndex("ItemInvoiceID");
+
+                    b.HasIndex("TaxId");
+
+                    b.ToTable("InvoiceItemTax");
+                });
+
             modelBuilder.Entity("EInvoice.DAL.Models.Item", b =>
                 {
                     b.Property<int>("ItemID")
@@ -121,32 +147,6 @@ namespace EInvoice.DAL.Migrations
                     b.HasKey("ItemID");
 
                     b.ToTable("Items");
-                });
-
-            modelBuilder.Entity("EInvoice.DAL.Models.ItemTax", b =>
-                {
-                    b.Property<int>("ItemTaxID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ItemTaxID"));
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TaxAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("TaxId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ItemTaxID");
-
-                    b.HasIndex("ItemId");
-
-                    b.HasIndex("TaxId");
-
-                    b.ToTable("ItemTax");
                 });
 
             modelBuilder.Entity("EInvoice.DAL.Models.Tax", b =>
@@ -191,7 +191,7 @@ namespace EInvoice.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("EInvoice.DAL.Models.Item", "Item")
-                        .WithMany()
+                        .WithMany("InvoiceItems")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -201,21 +201,21 @@ namespace EInvoice.DAL.Migrations
                     b.Navigation("Item");
                 });
 
-            modelBuilder.Entity("EInvoice.DAL.Models.ItemTax", b =>
+            modelBuilder.Entity("EInvoice.DAL.Models.InvoiceItemTax", b =>
                 {
-                    b.HasOne("EInvoice.DAL.Models.Item", "Item")
-                        .WithMany("ItemTaxes")
-                        .HasForeignKey("ItemId")
+                    b.HasOne("EInvoice.DAL.Models.InvoiceItem", "InvoiceItem")
+                        .WithMany("InvoiceItemTaxes")
+                        .HasForeignKey("ItemInvoiceID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("EInvoice.DAL.Models.Tax", "Tax")
-                        .WithMany("ItemTaxes")
+                        .WithMany("InvoiceItemTaxes")
                         .HasForeignKey("TaxId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Item");
+                    b.Navigation("InvoiceItem");
 
                     b.Navigation("Tax");
                 });
@@ -230,14 +230,19 @@ namespace EInvoice.DAL.Migrations
                     b.Navigation("InvoiceItems");
                 });
 
+            modelBuilder.Entity("EInvoice.DAL.Models.InvoiceItem", b =>
+                {
+                    b.Navigation("InvoiceItemTaxes");
+                });
+
             modelBuilder.Entity("EInvoice.DAL.Models.Item", b =>
                 {
-                    b.Navigation("ItemTaxes");
+                    b.Navigation("InvoiceItems");
                 });
 
             modelBuilder.Entity("EInvoice.DAL.Models.Tax", b =>
                 {
-                    b.Navigation("ItemTaxes");
+                    b.Navigation("InvoiceItemTaxes");
                 });
 #pragma warning restore 612, 618
         }

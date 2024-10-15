@@ -1,0 +1,114 @@
+﻿@page "/Tax/Form"
+@page "/Tax/Form/{TaxID:int?}"
+@inject HttpClient Http
+@inject GeneralService service
+
+<h3>TaxesForm</h3>
+
+<div class="container my-5">
+    <EditForm Model="@_tax" OnValidSubmit="SendData">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="my-3">
+            <InputText @bind-Value="_tax.Code" class="form-control" placeholder="Tax Code" />
+        </div>
+        <div class="my-3">
+            <InputText @bind-Value="_tax.Name" class="form-control" placeholder="Tax Name" />
+        </div>
+        <div class="my-3">
+            @if (TaxID.HasValue)
+            {
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-arrow-repeat"></i> Update
+                </button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-file-earmark-plus-fill"></i> Save
+                </button>
+            }
+            <NavLink href="/Tax" class="btn btn-secondary mx-2">
+                <i class="bi bi-arrow-return-right"></i> Return Back
+            </NavLink>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    private TaxDTO _tax = new TaxDTO();
+
+    [Parameter]
+    public int? TaxID { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (TaxID.HasValue)
+        {
+            _tax = new TaxDTO();
+            _tax = await Http.GetFromJsonAsync<TaxDTO>($"api/Tax/Form/{TaxID.Value}");
+        }
+        else
+        {
+            _tax = new TaxDTO();
+        }
+        StateHasChanged();
+    }
+
+
+    private async Task SendData()
+    {
+        if (TaxID.HasValue)
+        {
+            await Update();
+        }
+        else
+        {
+            await Save();
+        }
+        StateHasChanged();
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/Tax/Form", _tax);
+            if (response.IsSuccessStatusCode)
+            {
+                var newTax = await response.Content.ReadFromJsonAsync<TaxDTO>();
+            }
+            else
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error: {errorMessage}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving tax: {ex.Message}");
+        }
+    }
+
+    private async Task Update()
+    {
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"api/Tax/Form/{TaxID}", _tax);
+            if (response.IsSuccessStatusCode)
+            {
+                var newTax = await response.Content.ReadFromJsonAsync<TaxDTO>();
+            }
+            else
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error: {errorMessage}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving tax: {ex.Message}");
+        }
+    }
+}

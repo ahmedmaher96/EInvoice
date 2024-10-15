@@ -1,4 +1,4 @@
-﻿namespace EInvoice.API.ViewModels
+﻿namespace EInvoice.UI.ViewModels
 {
     public class SearchParameters
     {

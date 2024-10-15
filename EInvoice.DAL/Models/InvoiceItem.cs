@@ -21,7 +21,7 @@ namespace EInvoice.DAL.Models
         public int Quantity { get; set; }
         public decimal TotalAmount => Quantity * Amount;
 
-        public decimal TotalTaxes => Item.ItemTaxes?.Sum(i => i.TaxAmount) ?? 0;
+        public decimal TotalTaxes => InvoiceItemTaxes?.Sum(i => i.TaxAmount) ?? 0;
 
         public decimal TotalNetAmout => TotalAmount + TotalTaxes;
 
@@ -31,6 +31,7 @@ namespace EInvoice.DAL.Models
         public Item Item { get; set; }
         public int InvoiceId { get; set; }
         public Invoice Invoice { get; set; }
+        public ICollection<InvoiceItemTax> InvoiceItemTaxes {  get; set; }
 
         #endregion
 

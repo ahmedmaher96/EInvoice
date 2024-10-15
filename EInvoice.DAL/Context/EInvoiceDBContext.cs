@@ -42,9 +42,9 @@ namespace EInvoice.DAL.Context
                 entity.Property(i => i.Name).IsRequired().HasMaxLength(100);
                 entity.Property(i => i.Code).IsRequired();
 
-                entity.HasMany(i => i.ItemTaxes)
-                        .WithOne(it => it.Item)
-                        .HasForeignKey(it => it.ItemId);
+                entity.HasMany(i => i.InvoiceItems)
+                        .WithOne(ii => ii.Item)
+                        .HasForeignKey(ii => ii.ItemId);
             });
 
             // Tax
@@ -52,26 +52,26 @@ namespace EInvoice.DAL.Context
             {
                 entity.HasKey(t => t.TaxID);
                 entity.Property(t => t.Name).IsRequired().HasMaxLength(50);
-                entity.Property(i => i.Code).IsRequired();
+                entity.Property(t => t.Code).IsRequired();
 
-                entity.HasMany(t => t.ItemTaxes)
-                        .WithOne(it => it.Tax)
-                        .HasForeignKey(it => it.TaxId);
+                entity.HasMany(t => t.InvoiceItemTaxes)
+                        .WithOne(iit => iit.Tax)
+                        .HasForeignKey(it => it.InvoiceItemTaxID);
             });
 
-            // ItemTax
-            modelBuilder.Entity<ItemTax>(entity =>
+            // InvoiceItemTaxes
+            modelBuilder.Entity<InvoiceItemTax>(entity =>
             {
                 // Configure composite primary key
-                entity.HasKey(it => it.ItemTaxID);
+                entity.HasKey(it => it.InvoiceItemTaxID);
                 entity.Property(t => t.TaxAmount).HasColumnType("decimal(18,2)");
 
-                entity.HasOne(it => it.Item)
-                      .WithMany(i => i.ItemTaxes)
-                      .HasForeignKey(it => it.ItemId);
+                entity.HasOne(it => it.InvoiceItem)
+                      .WithMany(i => i.InvoiceItemTaxes)
+                      .HasForeignKey(it => it.ItemInvoiceID);
 
-                entity.HasOne(it => it.Tax)
-                      .WithMany(t => t.ItemTaxes)
+                entity.HasOne(t => t.Tax)
+                      .WithMany(it => it.InvoiceItemTaxes)
                       .HasForeignKey(it => it.TaxId);
             });
 
@@ -95,7 +95,7 @@ namespace EInvoice.DAL.Context
                       .HasForeignKey(ii => ii.InvoiceId);
             });
 
-            // ImvoceItem
+            // InvoiceItem
             modelBuilder.Entity<InvoiceItem>(entity =>
             {
                 entity.HasKey(ii => ii.ItemInvoiceID);
@@ -104,7 +104,7 @@ namespace EInvoice.DAL.Context
                 entity.Property(ii => ii.Quantity).IsRequired();
 
                 entity.HasOne(ii => ii.Item)
-                      .WithMany()
+                      .WithMany(i => i.InvoiceItems)
                       .HasForeignKey(ii => ii.ItemId);
 
                 entity.HasOne(ii => ii.Invoice)

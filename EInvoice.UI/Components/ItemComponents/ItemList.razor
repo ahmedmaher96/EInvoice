@@ -31,6 +31,7 @@
     {
         OnEdit.InvokeAsync(ItemID);
         NavigationManager.NavigateTo($"/Item/Form/{ItemID}");
+        StateHasChanged();
     }
 
 

@@ -1,0 +1,134 @@
+﻿@page "/Tax"
+@inject HttpClient Http
+@inject GeneralService service
+
+<div class="row my-2">
+    <div class="col-md-8">
+        <h3>Taxes</h3>
+    </div>
+    <div class="col-md-4 text-end">
+        <NavLink href="/Tax/Form" class="btn btn-success">
+            <i class="bi bi-file-earmark-plus-fill"></i> Add Tax
+        </NavLink>
+    </div>
+</div>
+
+<div class="container my-3">
+    <EditForm Model="@searchParameters" OnValidSubmit="HandleSearch">
+        <div class="my-2">
+            <InputText @bind-Value="searchParameters.Code" class="form-control" placeholder="Tax Code">
+            </InputText>
+        </div>
+        <div class="my-2">
+            <InputText @bind-Value="searchParameters.Name" class="form-control" placeholder="Tax Name">
+            </InputText>
+        </div>
+        <div class="my-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Search
+            </button>
+        </div>
+    </EditForm>
+    <br />
+    <br />
+    @if (taxes != null)
+    {
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Tax Code</th>
+                    <th>Tax Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                @foreach (var tax in taxes)
+                {
+                    <TaxList TaxCode="@tax.Code"
+                              TaxName="@tax.Name"
+                              TaxID="@tax.TaxID"
+                              _singleTax="singleTax"
+                              OnEdit="EditTax"
+                              OnDelete="DeleteTax">
+                    </TaxList>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="h3 alert alert-warning">There are no taxes yet ..</p>
+    }
+</div>
+
+@code {
+    private List<Tax> taxes = new List<Tax>();
+    public Tax singleTax { get; set; }
+    private SearchParameters searchParameters = new SearchParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchTaxes();
+    }
+
+    private async Task HandleSearch()
+    {
+        await FetchTaxes();
+    }
+
+    private async Task FetchTaxes()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<List<Tax>>($"api/Tax?filterCode={searchParameters.Code}&filterName={searchParameters.Name}");
+            taxes = response ?? new List<Tax>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching taxes: {ex.Message}");
+            taxes = new List<Tax>();
+        }
+    }
+
+    private async Task DeleteTax(int id)
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"api/Tax/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                taxes = taxes.Where(i => i.TaxID != id).ToList();
+            }
+            else
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during deletion: {ex.Message}");
+        }
+    }
+
+    public async Task EditTax(int id)
+    {
+        try
+        {
+            singleTax = taxes.FirstOrDefault(i => i.TaxID == id);
+
+            if (singleTax == null)
+            {
+                singleTax = await Http.GetFromJsonAsync<Tax>($"api/Tax/Form/{id}");
+            }
+
+            service.SetTax(singleTax!);
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching taxes: {ex.Message}");
+        }
+    }
+
+}

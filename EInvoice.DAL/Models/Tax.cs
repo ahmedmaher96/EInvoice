@@ -22,7 +22,7 @@ namespace EInvoice.DAL.Models
 
         #region Navigational Properties
 
-        public ICollection<ItemTax> ItemTaxes { get; set; }
+        public ICollection<InvoiceItemTax> InvoiceItemTaxes { get; set; }
 
         #endregion
 

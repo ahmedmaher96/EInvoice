@@ -1,0 +1,38 @@
+﻿<tr>
+    <td>@TaxCode</td>
+    <td>@TaxName</td>
+    <td>
+        <button class="btn btn-outline-warning" @onclick="NavigateToTaxForm">
+            <i class="bi bi-pencil-square"></i>
+        </button>
+        <a class="btn btn-outline-danger" @onclick="() => OnDelete.InvokeAsync(TaxID)">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>
+
+@code {
+    [Parameter]
+    public string TaxName { get; set; }
+    [Parameter]
+    public string TaxCode { get; set; }
+    [Parameter]
+    public int TaxID { get; set; }
+    [Parameter]
+    public Tax _singleTax { get; set; }
+    [Parameter]
+    public EventCallback<int> OnDelete { get; set; }
+    [Parameter]
+    public EventCallback<int> OnEdit { get; set; }
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    private void NavigateToTaxForm()
+    {
+        OnEdit.InvokeAsync(TaxID);
+        NavigationManager.NavigateTo($"/Tax/Form/{TaxID}");
+        StateHasChanged();
+    }
+
+
+}

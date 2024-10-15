@@ -1,0 +1,38 @@
+﻿<tr>
+    <td>@CustomerCode</td>
+    <td>@CustomerName</td>
+    <td>
+        <button class="btn btn-outline-warning" @onclick="NavigateToCustomerForm">
+            <i class="bi bi-pencil-square"></i>
+        </button>
+        <a class="btn btn-outline-danger" @onclick="() => OnDelete.InvokeAsync(CustomerID)">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>
+
+@code {
+    [Parameter]
+    public string CustomerName { get; set; }
+    [Parameter]
+    public string CustomerCode { get; set; }
+    [Parameter]
+    public int CustomerID { get; set; }
+    [Parameter]
+    public Customer _singleCustomer { get; set; }
+    [Parameter]
+    public EventCallback<int> OnDelete { get; set; }
+    [Parameter]
+    public EventCallback<int> OnEdit { get; set; }
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    private void NavigateToCustomerForm()
+    {
+        OnEdit.InvokeAsync(CustomerID);
+        NavigationManager.NavigateTo($"/Customer/Form/{CustomerID}");
+        StateHasChanged();
+    }
+
+
+}
