@@ -10,23 +10,23 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
         <div class="my-3">
-            <InputText @bind-Value="ItemName" class="form-control" placeholder="Item Code" />
+            <InputText @bind-Value="_item.Code" class="form-control" placeholder="Item Code" />
         </div>
         <div class="my-3">
-            <InputText @bind-Value="ItemCode" class="form-control" placeholder="Item Name" />
+            <InputText @bind-Value="_item.Name" class="form-control" placeholder="Item Name" />
         </div>
         <div class="my-3">
             @if (ItemID.HasValue)
             {
-                    <button type="submit" class="btn btn-warning">
-                        <i class="bi bi-arrow-repeat"></i> Update
-                    </button>
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-arrow-repeat"></i> Update
+                </button>
             }
             else
             {
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-file-earmark-plus-fill"></i> Save
-                    </button>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-file-earmark-plus-fill"></i> Save
+                </button>
             }
             <NavLink href="/Item" class="btn btn-secondary mx-2">
                 <i class="bi bi-arrow-return-right"></i> Return Back
@@ -40,10 +40,6 @@
 
     [Parameter]
     public int? ItemID { get; set; }
-    [Parameter]
-    public string ItemName { get; set; }
-    [Parameter]
-    public string ItemCode { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -52,15 +48,25 @@
         {
             if (itemService.ItemProperty != null)
             {
-                ItemCode = itemService.ItemProperty.Code;
-                ItemName = itemService.ItemProperty.Name;
+                _item.Code = itemService.ItemProperty.Code;
+                _item.Name = itemService.ItemProperty.Name;
             }
         }
-        _item.Code = ItemCode;
-        _item.Name = ItemName;
     }
 
     private async Task SendData()
+    {
+        if (ItemID.HasValue)
+        {
+            await Update();
+        }
+        else
+        {
+            await Save();
+        }
+    }
+
+    private async Task Save()
     {
         try
         {
@@ -81,4 +87,24 @@
         }
     }
 
+    private async Task Update()
+    {
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"api/Item/Form/{ItemID}", _item);
+            if (response.IsSuccessStatusCode)
+            {
+                var newItem = await response.Content.ReadFromJsonAsync<ItemDTO>();
+            }
+            else
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error: {errorMessage}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving item: {ex.Message}");
+        }
+    }
 }

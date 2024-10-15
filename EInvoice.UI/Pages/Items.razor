@@ -116,7 +116,7 @@
         {
             singleItem = await Http.GetFromJsonAsync<Item>($"api/Item/Form/{id}");
 
-            itemService.ItemProperty = singleItem;
+            itemService.GetItem(singleItem!);
         }
         catch (Exception ex)
         {
