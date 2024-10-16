@@ -25,7 +25,7 @@ namespace EInvoice.DAL.Models
         public InvoiceType Type {  get; set; }
 
         [Required(ErrorMessage ="Code is required")]
-        public string InvoiceCode { get; set; }
+        public string Code { get; set; }
 
         public DateTime DateTimeInssured { get; set; }
 

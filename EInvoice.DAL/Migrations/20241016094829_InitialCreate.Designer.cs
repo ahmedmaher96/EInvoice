@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EInvoice.DAL.Migrations
 {
     [DbContext(typeof(EInvoiceDBContext))]
-    [Migration("20241015182635_initialcreate")]
-    partial class initialcreate
+    [Migration("20241016094829_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
