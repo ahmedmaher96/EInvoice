@@ -12,14 +12,24 @@ namespace EInvoice.BLL.Handlers
 {
     public class GenericHandler<Tmodel, TDto> :  IGenericHandler<Tmodel, TDto> where Tmodel : class
     {
+        #region Private Attributes
+
         private readonly IGenericRepositry<Tmodel> _repository;
         private readonly IMapper _mapper;
+
+        #endregion
+
+        #region Constructors
 
         public GenericHandler(IGenericRepositry<Tmodel> repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
         }
+
+        #endregion
+
+        #region Implementation
 
         public async Task<IEnumerable<Tmodel>> GetElements(string? filterCode, string? filterName)
         {
@@ -67,5 +77,7 @@ namespace EInvoice.BLL.Handlers
         {
             _repository.Delete(id);
         }
+
+        #endregion
     }
 }

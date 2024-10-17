@@ -1,4 +1,6 @@
-﻿using EInvoice.BLL.Interfaces;
+﻿using AutoMapper;
+using EInvoice.BLL.DTO;
+using EInvoice.BLL.Interfaces;
 using EInvoice.DAL.Context;
 using EInvoice.DAL.Models;
 using Microsoft.EntityFrameworkCore;
@@ -12,75 +14,152 @@ namespace EInvoice.BLL.Repositries
 {
     public class InvoiceRepositry : IInvoiceRepositry
     {
-        #region Private Attributes
+        #region Private Attribute
 
         private readonly EInvoiceDBContext Context;
+        private readonly IMapper _mapper;
 
         #endregion
 
         #region Constructors
 
-        public InvoiceRepositry(EInvoiceDBContext dbcontext)
+        public InvoiceRepositry(EInvoiceDBContext context,IMapper mapper)
         {
-            Context = dbcontext;
+            Context = context;
+            _mapper = mapper;
         }
 
         #endregion
 
         #region Implementation
 
-        #region Retrieve
+        #region Invoice
 
         public IQueryable<Invoice> Query()
         {
             return Context.Invoices.AsQueryable();
         }
 
-        public async Task<IEnumerable<Invoice>> GetAllInvoiceAsync()
+        public async Task<IEnumerable<Invoice>> GetAllAsync()
         {
-            return await Query().ToListAsync();
+            return await Context.Invoices.ToListAsync();
         }
 
-        public async Task<IEnumerable<Invoice>> GetInvoiceList(string filterCode, int filterType, DateTime filterDateTimeInssured)
+        public async Task<IEnumerable<Invoice>> GetList(string filterCode, int filterType, DateTime filterDate)
         {
-            var filteredInvoices = await Query().Where(i => i.Code.Contains(filterCode)
-                                                        || i.Type.Equals(filterType)
-                                                        || i.DateTimeInssured == filterDateTimeInssured)
-                                                .ToListAsync();
-            return filteredInvoices;
+            return await Context.Invoices.Where(i => i.Code.Contains(filterCode)
+                                                || i.Type.Equals(filterType)
+                                                || i.DateTimeInssured.Equals(filterDate))
+                                        .ToListAsync();
         }
 
-        public async Task<Invoice> GetInvoiceByIdAsync(int id)
+        public async Task<Invoice> GetInvoiceByIdAsync(int invoiceId)
         {
-            return await Context.Invoices.FindAsync(id);
+            return await Context.Invoices.FindAsync(invoiceId);
+        }
+
+        public async Task<Invoice> AddInvoiceAsync(Invoice invoice)
+        {
+            Context.Invoices.Add(invoice);
+            await Context.SaveChangesAsync();
+            return invoice;
+        }
+
+        public async Task<Invoice> UpdateInvoiceAsync(Invoice invoice)
+        {
+            Context.Invoices.Update(invoice);
+            await Context.SaveChangesAsync();
+            return invoice;
+        }
+
+        public async Task<bool> DeleteInvoiceAsync(int invoiceId)
+        {
+            var invoice = await GetInvoiceByIdAsync(invoiceId);
+            if (invoice == null) return false;
+
+            Context.Invoices.Remove(invoice);
+            await Context.SaveChangesAsync();
+            return true;
         }
 
         #endregion
 
-        #region Modify
-        
-        public async Task AddInvoiceAsync(Invoice invoice)
+        #region InvoiceItem
+
+        public async Task<InvoiceItem> GetInvoiceItemByIdAsync(int invoiceItemId)
         {
-            await Context.Invoices.AddAsync(invoice);
-            await Context.SaveChangesAsync();
+            return await Context.InvoiceItems.FindAsync(invoiceItemId);
         }
 
-        public async Task UpdateInvoiceAsync(Invoice invoice)
+        // Check Again
+        public async Task<InvoiceItem> AddItemToInvoiceAsync(int invoiceId, InvoiceItemDTO itemdto)
         {
-            Context.Update(invoice);
+            var invoice = await GetInvoiceByIdAsync(invoiceId);
+            if (invoice == null) 
+                return null;
+
+            var item = _mapper.Map<InvoiceItem>(itemdto);
+            invoice.InvoiceItems.Add(item);
             await Context.SaveChangesAsync();
+            return item;
         }
 
-        public void DeleteInvoice(int id)
+        // Check again
+        public async Task<InvoiceItem> UpdateInvoiceItemAsync(int id, InvoiceItemDTO itemdto)
         {
-            var deletedInvoice = Context.Invoices.Find(id);
-            if (deletedInvoice != null)
-            {
-                Context.Invoices.Remove(deletedInvoice);
-                Context.SaveChanges();
-            }
+            var invoiceItem = await GetInvoiceItemByIdAsync(id);
+            if (invoiceItem == null)
+                return null;
+
+            _mapper.Map(itemdto, invoiceItem);
+            Context.InvoiceItems.Update(invoiceItem);
+            var mappedInvoiceItem = _mapper.Map<InvoiceItem>(invoiceItem);
+            await Context.SaveChangesAsync();
+            return invoiceItem;
+        }
+
+        public async Task<bool> DeleteInvoiceItemAsync(int itemInvoiceId)
+        {
+            var item = await Context.InvoiceItems.FindAsync(itemInvoiceId);
+            if (item == null) return false;
+
+            Context.InvoiceItems.Remove(item);
+            await Context.SaveChangesAsync();
+            return true;
+        }
+
+        #endregion
+
+        #region InvoiceItemTax
+
+        // Check
+        public async Task<InvoiceItemTax> AddTaxToInvoiceItemAsync(int itemInvoiceId, InvoiceItemTax tax)
+        {
+            var item = await Context.InvoiceItems.FindAsync(itemInvoiceId);
+            if (item == null) return null;
+
+            item.InvoiceItemTaxes.Add(tax);
+            await Context.SaveChangesAsync();
+            return tax;
+        }
+
+        // Check
+        public async Task<InvoiceItemTax> UpdateInvoiceItemTaxAsync(InvoiceItemTax tax)
+        {
+            Context.InvoiceItemTaxes.Update(tax);
+            await Context.SaveChangesAsync();
+            return tax;
+        }
+
+        public async Task<bool> DeleteInvoiceItemTaxAsync(int taxId)
+        {
+            var tax = await Context.InvoiceItemTaxes.FindAsync(taxId);
+            if (tax == null) return false;
+
+            Context.InvoiceItemTaxes.Remove(tax);
+            await Context.SaveChangesAsync();
+            return true;
         } 
-
         #endregion
 
         #endregion

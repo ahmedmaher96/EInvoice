@@ -12,11 +12,14 @@ namespace EInvoice.BLL.DTO
     {
         #region Properties
 
+        public int ItemId { get; set; }
+
         [Required]
         public decimal Amount { get; set; }
 
         [Required]
         public int Quantity { get; set; }
+
         public ICollection<InvoiceItemTax> InvoiceItemTaxes { get; set; }
 
         #endregion

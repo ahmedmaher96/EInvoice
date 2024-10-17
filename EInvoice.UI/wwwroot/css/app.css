@@ -101,3 +101,11 @@ a, .btn-link {
 code {
     color: #c02d76;
 }
+
+table.recieptbg {
+    background-color: #F9F4F8 !important;
+}
+
+    table.recieptbg tr, table.recieptbg td, table.recieptbg th {
+        background-color: inherit !important;
+    }

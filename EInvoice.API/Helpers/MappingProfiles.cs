@@ -16,6 +16,8 @@ namespace EInvoice.API.Helpers
             CreateMap<Customer, CustomerDTO>();
             CreateMap<TaxDTO, Tax>();
             CreateMap<Tax, TaxDTO>();
+            CreateMap<InvoiceItem, InvoiceItemDTO>();
+            CreateMap<InvoiceItemDTO, InvoiceItem>();
         }
     }
 }

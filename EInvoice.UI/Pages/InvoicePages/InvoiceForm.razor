@@ -1,0 +1,195 @@
+﻿@page "/Invoice/Form"
+
+<h3>Invoice Form</h3>
+<form action="/" method="post">
+    <div class="row">
+        <div class="col-lg-4 border-end border-1 border-dark">
+            <label>
+                Code
+            </label>
+            <input type="text" name="name" value="" />
+            <label>
+                Type
+            </label>
+            <select class="form-select" aria-label="Default select example">
+                <option selected>Open this select menu</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+            </select>
+        </div>
+
+        <div class="col-lg-8" style="height: 70vh;">
+            <div class="text-end mb-3">
+                <button class="btn btn-success"> add items</button>
+            </div>
+            <div class="container my-2 py-2 overflow-auto" style="background-color: #F9F4F8; height: 100%;">
+                <div class="row">
+                    <div class="well col-lg-12">
+                        <div class="row">
+                            <div class="col-xs-8 col-sm-8 col-md-8">
+                                <h4>
+                                    <strong>E-Invoice</strong>
+                                </h4>
+                            </div>
+                            <div class="col-xs-4 col-sm-4 col-md-4 text-right">
+                                <p>
+                                    <em>Date: 1st November, 2013</em>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="text-center">
+                                <h4>Invoice Code</h4>
+                            </div>
+                            <table class="table recieptbg">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th class="text-center">Price</th>
+                                        <th class="text-center">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    <tr>
+                                        <td class="col-md-9"><p><em>Lebanese Cabbage Salad</em></p></td>
+                                        <td class="col-md-1" style="text-align: center"> 1 </td>
+                                        <td class="col-md-1 text-center">$8</td>
+                                        <td class="col-md-1 text-center">$8</td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td colspan="2">
+                                            <button>
+                                                Edit
+                                            </button>
+                                            <button>
+                                                Delete
+                                            </button>
+                                        </td>
+                                        <td class="text-right">
+                                            
+                                            <p>
+                                                <strong>Tax: </strong>
+                                            </p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p>
+                                                <strong>$6.94</strong>
+                                            </p>
+                                            
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-md-9"><p><em>Lebanese Cabbage Salad</em></p></td>
+                                        <td class="col-md-1" style="text-align: center"> 1 </td>
+                                        <td class="col-md-1 text-center">$8</td>
+                                        <td class="col-md-1 text-center">$8</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <button>
+                                                Edit
+                                            </button>
+                                            <button>
+                                                Delete
+                                            </button>
+                                        </td>
+                                        <td class="text-right">
+
+                                            <p>
+                                                <strong>Tax: </strong>
+                                            </p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p>
+                                                <strong>$6.94</strong>
+                                            </p>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-md-9"><p><em>Lebanese Cabbage Salad</em></p></td>
+                                        <td class="col-md-1" style="text-align: center"> 1 </td>
+                                        <td class="col-md-1 text-center">$8</td>
+                                        <td class="col-md-1 text-center">$8</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <button>
+                                                Edit
+                                            </button>
+                                            <button>
+                                                Delete
+                                            </button>
+                                        </td>
+                                        <td class="text-right">
+
+                                            <p>
+                                                <strong>Tax: </strong>
+                                            </p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p>
+                                                <strong>$6.94</strong>
+                                            </p>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-md-9"><p><em>Lebanese Cabbage Salad</em></p></td>
+                                        <td class="col-md-1" style="text-align: center"> 1 </td>
+                                        <td class="col-md-1 text-center">$8</td>
+                                        <td class="col-md-1 text-center">$8</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <button>
+                                                Edit
+                                            </button>
+                                            <button>
+                                                Delete
+                                            </button>
+                                        </td>
+                                        <td class="text-right">
+
+                                            <p>
+                                                <strong>Tax: </strong>
+                                            </p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p>
+                                                <strong>$6.94</strong>
+                                            </p>
+
+                                        </td>
+                                    </tr>
+                                    <tr class="border-top border-black">
+                                        <td>   </td>
+                                        <td>   </td>
+                                        <td class="text-right"><h4><strong>Total: </strong></h4></td>
+                                        <td class="text-center text-danger"><h4><strong>$31.53</strong></h4></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="text-start">
+        <button>Save</button>
+        <button>Print</button>
+        <button>Return</button>
+    </div>
+</form>
+@code {
+
+}

@@ -29,6 +29,8 @@ namespace EInvoice.DAL.Context
         public DbSet<Tax> Taxs { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<InvoiceItem> InvoiceItems { get; set; }
+        public DbSet<InvoiceItemTax> InvoiceItemTaxes { get; set; }
 
         #endregion
 
@@ -87,7 +89,7 @@ namespace EInvoice.DAL.Context
             modelBuilder.Entity<Invoice>(entity =>
             {
                 entity.HasKey(e => e.InvoiceID);
-                entity.Property(e => e.InvoiceCode).IsRequired();
+                entity.Property(e => e.Code).IsRequired();
                 entity.Property(e => e.Type).IsRequired();
 
                 entity.HasMany(e => e.InvoiceItems)
