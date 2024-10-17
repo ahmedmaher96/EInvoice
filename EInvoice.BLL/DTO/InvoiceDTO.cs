@@ -20,7 +20,7 @@ namespace EInvoice.BLL.DTO
 
         public DateTime DateTimeInssured { get; set; }
 
-        public List<InvoiceItem> InvoiceItems { get; set; }
+        public ICollection<InvoiceItemDTO> InvoiceItems { get; set; }
 
         #endregion
     }

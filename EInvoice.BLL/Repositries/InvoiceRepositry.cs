@@ -92,14 +92,10 @@ namespace EInvoice.BLL.Repositries
         }
 
         // Check Again
-        public async Task<InvoiceItem> AddItemToInvoiceAsync(int invoiceId, InvoiceItemDTO itemdto)
+        public async Task<InvoiceItem> AddItemToInvoiceAsync(InvoiceItemDTO itemdto)
         {
-            var invoice = await GetInvoiceByIdAsync(invoiceId);
-            if (invoice == null) 
-                return null;
-
             var item = _mapper.Map<InvoiceItem>(itemdto);
-            invoice.InvoiceItems.Add(item);
+            await Context.InvoiceItems.AddAsync(item);
             await Context.SaveChangesAsync();
             return item;
         }
@@ -133,22 +129,20 @@ namespace EInvoice.BLL.Repositries
         #region InvoiceItemTax
 
         // Check
-        public async Task<InvoiceItemTax> AddTaxToInvoiceItemAsync(int itemInvoiceId, InvoiceItemTax tax)
+        public async Task<InvoiceItemTax> AddTaxToInvoiceItemAsync(InvoiceItemTaxDTO itemTaxdto)
         {
-            var item = await Context.InvoiceItems.FindAsync(itemInvoiceId);
-            if (item == null) return null;
-
-            item.InvoiceItemTaxes.Add(tax);
+            var tax = _mapper.Map<InvoiceItemTax>(itemTaxdto);
+            await Context.InvoiceItemTaxes.AddAsync(tax);
             await Context.SaveChangesAsync();
             return tax;
         }
 
         // Check
-        public async Task<InvoiceItemTax> UpdateInvoiceItemTaxAsync(InvoiceItemTax tax)
+        public async Task<InvoiceItemTax> UpdateInvoiceItemTaxAsync(InvoiceItemTax itemTax)
         {
-            Context.InvoiceItemTaxes.Update(tax);
+            Context.InvoiceItemTaxes.Update(itemTax);
             await Context.SaveChangesAsync();
-            return tax;
+            return itemTax;
         }
 
         public async Task<bool> DeleteInvoiceItemTaxAsync(int taxId)

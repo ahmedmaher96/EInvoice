@@ -34,7 +34,7 @@ namespace EInvoice.BLL.Interfaces
 
         Task<InvoiceItem> GetInvoiceItemByIdAsync(int id);
 
-        Task<InvoiceItem> AddItemToInvoiceAsync(int invoiceId, InvoiceItemDTO item);
+        Task<InvoiceItem> AddItemToInvoiceAsync(InvoiceItemDTO item);
 
         Task<InvoiceItem> UpdateInvoiceItemAsync(int id, InvoiceItemDTO item);
 
@@ -44,11 +44,11 @@ namespace EInvoice.BLL.Interfaces
 
         #region InvoiceItemTax
 
-        Task<InvoiceItemTax> AddTaxToInvoiceItemAsync(int itemInvoiceId, InvoiceItemTax tax);
+        Task<InvoiceItemTax> AddTaxToInvoiceItemAsync(InvoiceItemTaxDTO itemTaxdto);
 
-        Task<InvoiceItemTax> UpdateInvoiceItemTaxAsync(InvoiceItemTax tax);
+        Task<InvoiceItemTax> UpdateInvoiceItemTaxAsync(InvoiceItemTax itemTaxdto);
 
-        Task<bool> DeleteInvoiceItemTaxAsync(int taxId); 
+        Task<bool> DeleteInvoiceItemTaxAsync(int itemTaxId); 
 
         #endregion
 
