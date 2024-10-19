@@ -20,7 +20,7 @@ namespace EInvoice.BLL.DTO
 
         public int ItemID { get; set; }
 
-        //public ICollection<InvoiceItemTaxDTO> InvoiceItemTaxes { get; set; }
+        public ICollection<InvoiceItemTaxDTO> InvoiceItemTaxes { get; set; }
 
         #endregion
     }

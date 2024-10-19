@@ -23,7 +23,7 @@ namespace EInvoice.BLL.Repositries
 
         #region Constructors
 
-        public InvoiceRepositry(EInvoiceDBContext context,IMapper mapper)
+        public InvoiceRepositry(EInvoiceDBContext context, IMapper mapper)
         {
             Context = context;
             _mapper = mapper;
@@ -58,8 +58,30 @@ namespace EInvoice.BLL.Repositries
             return await Context.Invoices.FindAsync(invoiceId);
         }
 
-        public async Task<Invoice> AddInvoiceAsync(Invoice invoice)
+        public async Task<Invoice> AddInvoiceAsync(InvoiceDTO invoicedto)
         {
+            var customer = await Context.Customers.Where(c => c.CustomerID == invoicedto.CustomerID).FirstOrDefaultAsync();
+            if (customer != null)
+                invoicedto.CustomerID = customer.CustomerID;
+
+            ICollection<InvoiceItemDTO> invoceItemsList = invoicedto.InvoiceItems;
+
+            foreach (var invoiceItem in invoceItemsList)
+            {
+                ICollection<InvoiceItemTaxDTO> invoiceItemTaxList = invoiceItem.InvoiceItemTaxes;
+                foreach (var invoiceItemTax in invoiceItemTaxList)
+                {
+                    var itemTaxes = await AddTaxToInvoiceItemAsync(invoiceItemTax);
+                    invoiceItemTax.TaxId = itemTaxes.TaxId ?? 0;
+                    await Context.InvoiceItemTaxes.AddAsync(itemTaxes);
+                }
+                var item = await AddItemToInvoiceAsync(invoiceItem);
+                invoiceItem.ItemID = item.ItemId ?? 0;
+                await Context.InvoiceItems.AddAsync(item);
+            }
+
+
+            var invoice = _mapper.Map<Invoice>(invoicedto);
             Context.Invoices.Add(invoice);
             await Context.SaveChangesAsync();
             return invoice;
@@ -91,21 +113,23 @@ namespace EInvoice.BLL.Repositries
             return await Context.InvoiceItems.FindAsync(invoiceItemId);
         }
 
-        // Check Again
+
         public async Task<InvoiceItem> AddItemToInvoiceAsync(InvoiceItemDTO itemdto)
         {
+            var itemInvoice = await Context.Items.Where(i => i.ItemID == itemdto.ItemID).FirstOrDefaultAsync();
+            if (itemInvoice != null)
+                itemdto.ItemID = itemInvoice.ItemID;
+
             var item = _mapper.Map<InvoiceItem>(itemdto);
-            await Context.InvoiceItems.AddAsync(item);
-            await Context.SaveChangesAsync();
             return item;
         }
 
-        // Check again
+
         public async Task<InvoiceItem> UpdateInvoiceItemAsync(int id, InvoiceItemDTO itemdto)
         {
             var invoiceItem = await GetInvoiceItemByIdAsync(id);
             if (invoiceItem == null)
-                return null;
+                throw new Exception("Not found");
 
             _mapper.Map(itemdto, invoiceItem);
             Context.InvoiceItems.Update(invoiceItem);
@@ -114,10 +138,9 @@ namespace EInvoice.BLL.Repositries
             return invoiceItem;
         }
 
-        public async Task<bool> DeleteInvoiceItemAsync(int itemInvoiceId)
+        public async Task<bool> DeleteInvoiceItemAsync(int invoiceItemId)
         {
-            var item = await Context.InvoiceItems.FindAsync(itemInvoiceId);
-            if (item == null) return false;
+            var item = await GetInvoiceItemByIdAsync(invoiceItemId);
 
             Context.InvoiceItems.Remove(item);
             await Context.SaveChangesAsync();
@@ -128,32 +151,45 @@ namespace EInvoice.BLL.Repositries
 
         #region InvoiceItemTax
 
-        // Check
+        public async Task<IEnumerable<InvoiceItemTax>> GetInvoiceItemTaxes(int invoiceItemId)
+        {
+            return await Context.InvoiceItemTaxes.Where(c => c.InvoiceItemID == invoiceItemId).ToListAsync();
+        }
+
         public async Task<InvoiceItemTax> AddTaxToInvoiceItemAsync(InvoiceItemTaxDTO itemTaxdto)
         {
+            var itemtax = await Context.Taxs.Where(c => c.TaxID == itemTaxdto.TaxId).FirstOrDefaultAsync();
+            if (itemtax != null)
+                itemTaxdto.TaxId = itemtax.TaxID;
+
             var tax = _mapper.Map<InvoiceItemTax>(itemTaxdto);
-            await Context.InvoiceItemTaxes.AddAsync(tax);
-            await Context.SaveChangesAsync();
             return tax;
         }
 
-        // Check
-        public async Task<InvoiceItemTax> UpdateInvoiceItemTaxAsync(InvoiceItemTax itemTax)
-        {
-            Context.InvoiceItemTaxes.Update(itemTax);
-            await Context.SaveChangesAsync();
-            return itemTax;
-        }
+        //// Check
+        //public async Task<InvoiceItemTax> UpdateInvoiceItemTaxAsync(int invoiceItemId, InvoiceItemTaxDTO itemTaxdto)
+        //{
+        //    var invoiceItemTax = await GetInvoiceItemTax(invoiceItemId);
+        //    if (invoiceItemTax == null)
+        //        throw new Exception("Not found");
+
+        //    _mapper.Map(itemTaxdto, invoiceItemTax);
+        //    Context.InvoiceItemTaxes.Update(invoiceItemTax);
+        //    var mappedInvoiceItem = _mapper.Map<InvoiceItem>(invoiceItemTax);
+        //    await Context.SaveChangesAsync();
+        //    return invoiceItemTax;
+        //}
 
         public async Task<bool> DeleteInvoiceItemTaxAsync(int taxId)
         {
             var tax = await Context.InvoiceItemTaxes.FindAsync(taxId);
-            if (tax == null) return false;
+            if (tax == null)
+                throw new Exception("Tax was not Found");
 
             Context.InvoiceItemTaxes.Remove(tax);
             await Context.SaveChangesAsync();
             return true;
-        } 
+        }
         #endregion
 
         #endregion

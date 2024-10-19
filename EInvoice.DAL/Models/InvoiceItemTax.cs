@@ -13,9 +13,9 @@ namespace EInvoice.DAL.Models
 
         [Key]
         public int InvoiceItemTaxID { get; set; }
-        public int ItemInvoiceID { get; set; }
+        public int? InvoiceItemID { get; set; }
         public InvoiceItem InvoiceItem { get; set; }
-        public int TaxId { get; set; }
+        public int? TaxId { get; set; }
         public Tax Tax { get; set; }
         public decimal TaxAmount { get; set; }
 

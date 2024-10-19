@@ -1,7 +1,9 @@
 
 using EInvoice.API.Helpers;
 using EInvoice.BLL.Handlers;
+using EInvoice.BLL.Interfaces;
 using EInvoice.BLL.Interfaces.IGeneric;
+using EInvoice.BLL.Repositries;
 using EInvoice.BLL.Repositries.Generic;
 using EInvoice.DAL.Context;
 using Microsoft.EntityFrameworkCore;
@@ -20,8 +22,15 @@ namespace EInvoice.API
             {
                 Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+            builder.Services.AddControllers()
+                            .AddJsonOptions(options =>
+                            {
+                                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                                options.JsonSerializerOptions.MaxDepth = 64;
+                            });
             builder.Services.AddScoped(typeof(IGenericRepositry<>), typeof(GenericRepositries<>));
             builder.Services.AddScoped(typeof(IGenericHandler<,>), typeof(GenericHandler<,>));
+            builder.Services.AddScoped<IInvoiceRepositry, InvoiceRepositry>();
             builder.Services.AddAutoMapper(typeof(MappingProfiles));
             builder.Services.AddCors(options =>
             {

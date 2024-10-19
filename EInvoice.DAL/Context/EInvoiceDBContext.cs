@@ -64,13 +64,12 @@ namespace EInvoice.DAL.Context
             // InvoiceItemTaxes
             modelBuilder.Entity<InvoiceItemTax>(entity =>
             {
-                // Configure composite primary key
                 entity.HasKey(it => it.InvoiceItemTaxID);
                 entity.Property(t => t.TaxAmount).HasColumnType("decimal(18,2)");
 
                 entity.HasOne(it => it.InvoiceItem)
                       .WithMany(i => i.InvoiceItemTaxes)
-                      .HasForeignKey(it => it.ItemInvoiceID);
+                      .HasForeignKey(it => it.InvoiceItemID);
 
                 entity.HasOne(t => t.Tax)
                       .WithMany(it => it.InvoiceItemTaxes)
@@ -83,9 +82,14 @@ namespace EInvoice.DAL.Context
                 entity.HasKey(c => c.CustomerID);
                 entity.Property(c => c.Name).IsRequired().HasMaxLength(100);
                 entity.Property(i => i.Code).IsRequired();
+
+                entity.HasMany(c => c.Invoices)
+                        .WithOne(i => i.Customer)
+                        .HasForeignKey(i => i.CustomerID)
+                        .OnDelete(DeleteBehavior.SetNull);
             });
 
-            // EInvoice
+            // Invoice
             modelBuilder.Entity<Invoice>(entity =>
             {
                 entity.HasKey(e => e.InvoiceID);
@@ -100,7 +104,7 @@ namespace EInvoice.DAL.Context
             // InvoiceItem
             modelBuilder.Entity<InvoiceItem>(entity =>
             {
-                entity.HasKey(ii => ii.ItemInvoiceID);
+                entity.HasKey(ii => ii.InvoiceItemID);
 
                 entity.Property(ii => ii.Amount).IsRequired().HasColumnType("decimal(18,2)");
                 entity.Property(ii => ii.Quantity).IsRequired();
@@ -112,6 +116,7 @@ namespace EInvoice.DAL.Context
                 entity.HasOne(ii => ii.Invoice)
                       .WithMany(i => i.InvoiceItems)
                       .HasForeignKey(ii => ii.InvoiceId);
+
             });
 
         }

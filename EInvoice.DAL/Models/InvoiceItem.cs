@@ -12,7 +12,7 @@ namespace EInvoice.DAL.Models
         #region Properties
 
         [Key]
-        public int ItemInvoiceID { get; set; }
+        public int InvoiceItemID { get; set; }
 
         [Required]
         public decimal Amount { get; set; }
@@ -27,9 +27,9 @@ namespace EInvoice.DAL.Models
 
         #region Navigational Properties
 
-        public int ItemId { get; set; }
+        public int? ItemId { get; set; }
         public Item Item { get; set; }
-        public int InvoiceId { get; set; }
+        public int? InvoiceId { get; set; }
         public Invoice Invoice { get; set; }
         public ICollection<InvoiceItemTax> InvoiceItemTaxes {  get; set; }
 

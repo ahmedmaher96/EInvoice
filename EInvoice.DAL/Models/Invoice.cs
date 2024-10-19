@@ -31,6 +31,7 @@ namespace EInvoice.DAL.Models
 
         #region Navigational Properties
 
+        public int? CustomerID { get; set; }
         public Customer Customer { get; set; }
 
         public List<InvoiceItem> InvoiceItems { get; set; }

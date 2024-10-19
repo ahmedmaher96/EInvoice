@@ -10,16 +10,12 @@ namespace EInvoice.API.Helpers
         {
             //CreateMap<model,modeldto>()
             //          .Formember(property,MapFrom(where to find it));
-            CreateMap<ItemDTO, Item>();
-            CreateMap<Item, ItemDTO>();
-            CreateMap<CustomerDTO, Customer>();
-            CreateMap<Customer, CustomerDTO>();
-            CreateMap<TaxDTO, Tax>();
-            CreateMap<Tax, TaxDTO>();
-            CreateMap<InvoiceItem, InvoiceItemDTO>();
-            CreateMap<InvoiceItemDTO, InvoiceItem>();
-            CreateMap<InvoiceItemTax, InvoiceItemTaxDTO>();
-            CreateMap<InvoiceItemTaxDTO, InvoiceItemTax>();
+            CreateMap<Item, ItemDTO>().ReverseMap();
+            CreateMap<Customer, CustomerDTO>().ReverseMap();
+            CreateMap<Tax, TaxDTO>().ReverseMap();
+            CreateMap<Invoice, InvoiceDTO>().ReverseMap();
+            CreateMap<InvoiceItem, InvoiceItemDTO>().ReverseMap();
+            CreateMap<InvoiceItemTax, InvoiceItemTaxDTO>().ReverseMap();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace EInvoice.BLL.Interfaces
     {
         // Signatures
 
-        #region Invoice Signatures
+        #region Invoice
 
         IQueryable<Invoice> Query();
 
@@ -22,7 +22,7 @@ namespace EInvoice.BLL.Interfaces
 
         Task<Invoice> GetInvoiceByIdAsync(int invoiceId);
 
-        Task<Invoice> AddInvoiceAsync(Invoice invoice);
+        Task<Invoice> AddInvoiceAsync(InvoiceDTO invoicedto);
 
         Task<Invoice> UpdateInvoiceAsync(Invoice invoice);
 
@@ -34,7 +34,7 @@ namespace EInvoice.BLL.Interfaces
 
         Task<InvoiceItem> GetInvoiceItemByIdAsync(int id);
 
-        Task<InvoiceItem> AddItemToInvoiceAsync(InvoiceItemDTO item);
+        //Task<InvoiceItem> AddItemToInvoiceAsync(InvoiceItemDTO item);
 
         Task<InvoiceItem> UpdateInvoiceItemAsync(int id, InvoiceItemDTO item);
 
@@ -44,9 +44,11 @@ namespace EInvoice.BLL.Interfaces
 
         #region InvoiceItemTax
 
-        Task<InvoiceItemTax> AddTaxToInvoiceItemAsync(InvoiceItemTaxDTO itemTaxdto);
+        Task<IEnumerable<InvoiceItemTax>> GetInvoiceItemTaxes(int invoiceItemId);
 
-        Task<InvoiceItemTax> UpdateInvoiceItemTaxAsync(InvoiceItemTax itemTaxdto);
+        //Task<InvoiceItemTax> AddTaxToInvoiceItemAsync(InvoiceItemTaxDTO itemTaxdto);
+
+        //Task<InvoiceItemTax> UpdateInvoiceItemTaxAsync(InvoiceItemTax itemTaxdto);
 
         Task<bool> DeleteInvoiceItemTaxAsync(int itemTaxId); 
 

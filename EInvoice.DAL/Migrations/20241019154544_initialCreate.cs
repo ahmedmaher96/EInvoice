@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EInvoice.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,9 +60,9 @@ namespace EInvoice.DAL.Migrations
                     InvoiceID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    InvoiceCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateTimeInssured = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CustomerID = table.Column<int>(type: "int", nullable: false)
+                    CustomerID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -72,14 +72,14 @@ namespace EInvoice.DAL.Migrations
                         column: x => x.CustomerID,
                         principalTable: "Customers",
                         principalColumn: "CustomerID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
-                name: "InvoiceItem",
+                name: "InvoiceItems",
                 columns: table => new
                 {
-                    ItemInvoiceID = table.Column<int>(type: "int", nullable: false)
+                    InvoiceItemID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
@@ -88,15 +88,15 @@ namespace EInvoice.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InvoiceItem", x => x.ItemInvoiceID);
+                    table.PrimaryKey("PK_InvoiceItems", x => x.InvoiceItemID);
                     table.ForeignKey(
-                        name: "FK_InvoiceItem_Invoices_InvoiceId",
+                        name: "FK_InvoiceItems_Invoices_InvoiceId",
                         column: x => x.InvoiceId,
                         principalTable: "Invoices",
                         principalColumn: "InvoiceID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_InvoiceItem_Items_ItemId",
+                        name: "FK_InvoiceItems_Items_ItemId",
                         column: x => x.ItemId,
                         principalTable: "Items",
                         principalColumn: "ItemID",
@@ -104,26 +104,26 @@ namespace EInvoice.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "InvoiceItemTax",
+                name: "InvoiceItemTaxes",
                 columns: table => new
                 {
                     InvoiceItemTaxID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ItemInvoiceID = table.Column<int>(type: "int", nullable: false),
+                    InvoiceItemID = table.Column<int>(type: "int", nullable: false),
                     TaxId = table.Column<int>(type: "int", nullable: false),
                     TaxAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InvoiceItemTax", x => x.InvoiceItemTaxID);
+                    table.PrimaryKey("PK_InvoiceItemTaxes", x => x.InvoiceItemTaxID);
                     table.ForeignKey(
-                        name: "FK_InvoiceItemTax_InvoiceItem_ItemInvoiceID",
-                        column: x => x.ItemInvoiceID,
-                        principalTable: "InvoiceItem",
-                        principalColumn: "ItemInvoiceID",
+                        name: "FK_InvoiceItemTaxes_InvoiceItems_InvoiceItemID",
+                        column: x => x.InvoiceItemID,
+                        principalTable: "InvoiceItems",
+                        principalColumn: "InvoiceItemID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_InvoiceItemTax_Taxs_TaxId",
+                        name: "FK_InvoiceItemTaxes_Taxs_TaxId",
                         column: x => x.TaxId,
                         principalTable: "Taxs",
                         principalColumn: "TaxID",
@@ -131,23 +131,23 @@ namespace EInvoice.DAL.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_InvoiceItem_InvoiceId",
-                table: "InvoiceItem",
+                name: "IX_InvoiceItems_InvoiceId",
+                table: "InvoiceItems",
                 column: "InvoiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InvoiceItem_ItemId",
-                table: "InvoiceItem",
+                name: "IX_InvoiceItems_ItemId",
+                table: "InvoiceItems",
                 column: "ItemId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InvoiceItemTax_ItemInvoiceID",
-                table: "InvoiceItemTax",
-                column: "ItemInvoiceID");
+                name: "IX_InvoiceItemTaxes_InvoiceItemID",
+                table: "InvoiceItemTaxes",
+                column: "InvoiceItemID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InvoiceItemTax_TaxId",
-                table: "InvoiceItemTax",
+                name: "IX_InvoiceItemTaxes_TaxId",
+                table: "InvoiceItemTaxes",
                 column: "TaxId");
 
             migrationBuilder.CreateIndex(
@@ -160,10 +160,10 @@ namespace EInvoice.DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "InvoiceItemTax");
+                name: "InvoiceItemTaxes");
 
             migrationBuilder.DropTable(
-                name: "InvoiceItem");
+                name: "InvoiceItems");
 
             migrationBuilder.DropTable(
                 name: "Taxs");

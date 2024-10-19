@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EInvoice.DAL.Migrations
 {
     [DbContext(typeof(EInvoiceDBContext))]
-    [Migration("20241017112625_SecondCreate")]
-    partial class SecondCreate
+    [Migration("20241019161939_modification")]
+    partial class modification
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -59,7 +59,7 @@ namespace EInvoice.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CustomerID")
+                    b.Property<int?>("CustomerID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateTimeInssured")
@@ -77,25 +77,25 @@ namespace EInvoice.DAL.Migrations
 
             modelBuilder.Entity("EInvoice.DAL.Models.InvoiceItem", b =>
                 {
-                    b.Property<int>("ItemInvoiceID")
+                    b.Property<int>("InvoiceItemID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ItemInvoiceID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceItemID"));
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("InvoiceId")
+                    b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ItemId")
+                    b.Property<int?>("ItemId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("ItemInvoiceID");
+                    b.HasKey("InvoiceItemID");
 
                     b.HasIndex("InvoiceId");
 
@@ -112,7 +112,7 @@ namespace EInvoice.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceItemTaxID"));
 
-                    b.Property<int>("ItemInvoiceID")
+                    b.Property<int>("InvoiceItemID")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TaxAmount")
@@ -123,7 +123,7 @@ namespace EInvoice.DAL.Migrations
 
                     b.HasKey("InvoiceItemTaxID");
 
-                    b.HasIndex("ItemInvoiceID");
+                    b.HasIndex("InvoiceItemID");
 
                     b.HasIndex("TaxId");
 
@@ -179,8 +179,7 @@ namespace EInvoice.DAL.Migrations
                     b.HasOne("EInvoice.DAL.Models.Customer", "Customer")
                         .WithMany("Invoices")
                         .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Customer");
                 });
@@ -189,15 +188,11 @@ namespace EInvoice.DAL.Migrations
                 {
                     b.HasOne("EInvoice.DAL.Models.Invoice", "Invoice")
                         .WithMany("InvoiceItems")
-                        .HasForeignKey("InvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InvoiceId");
 
                     b.HasOne("EInvoice.DAL.Models.Item", "Item")
                         .WithMany("InvoiceItems")
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ItemId");
 
                     b.Navigation("Invoice");
 
@@ -208,7 +203,7 @@ namespace EInvoice.DAL.Migrations
                 {
                     b.HasOne("EInvoice.DAL.Models.InvoiceItem", "InvoiceItem")
                         .WithMany("InvoiceItemTaxes")
-                        .HasForeignKey("ItemInvoiceID")
+                        .HasForeignKey("InvoiceItemID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

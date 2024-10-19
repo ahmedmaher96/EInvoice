@@ -11,8 +11,9 @@ namespace EInvoice.BLL.DTO
     {
         #region Properties
 
-        public int InvoiceItemID { get; set; }
-        public ICollection<TaxDTO> Taxes { get; set; }
+        public int TaxId { get; set; }
+
+        public decimal TaxAmount { get; set; }
 
         #endregion
     }
