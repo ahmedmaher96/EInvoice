@@ -46,14 +46,14 @@
     {
         if (ItemID.HasValue)
         {
-            _item = new ItemDTO(); // Reset the item object before loading a new one
+            _item = new ItemDTO();
             _item = await Http.GetFromJsonAsync<ItemDTO>($"api/Item/Form/{ItemID.Value}");
         }
         else
         {
-            _item = new ItemDTO(); // Clear the form if no item is being edited
+            _item = new ItemDTO();
         }
-        StateHasChanged(); // Ensure UI refresh after data is set
+        StateHasChanged();
     }
 
 

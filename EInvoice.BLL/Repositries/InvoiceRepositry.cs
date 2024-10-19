@@ -45,7 +45,7 @@ namespace EInvoice.BLL.Repositries
             return await Context.Invoices.ToListAsync();
         }
 
-        public async Task<IEnumerable<Invoice>> GetList(string filterCode, int filterType, DateTime filterDate)
+        public async Task<IEnumerable<Invoice>> GetList(string filterCode, InvoiceType? filterType, DateTime? filterDate)
         {
             return await Context.Invoices.Where(i => i.Code.Contains(filterCode)
                                                 || i.Type.Equals(filterType)
@@ -73,11 +73,9 @@ namespace EInvoice.BLL.Repositries
                 {
                     var itemTaxes = await AddTaxToInvoiceItemAsync(invoiceItemTax);
                     invoiceItemTax.TaxId = itemTaxes.TaxId ?? 0;
-                    await Context.InvoiceItemTaxes.AddAsync(itemTaxes);
                 }
                 var item = await AddItemToInvoiceAsync(invoiceItem);
                 invoiceItem.ItemID = item.ItemId ?? 0;
-                await Context.InvoiceItems.AddAsync(item);
             }
 
 
@@ -94,14 +92,14 @@ namespace EInvoice.BLL.Repositries
             return invoice;
         }
 
-        public async Task<bool> DeleteInvoiceAsync(int invoiceId)
+        public void DeleteInvoice(int invoiceId)
         {
-            var invoice = await GetInvoiceByIdAsync(invoiceId);
-            if (invoice == null) return false;
+            var invoice = Context.Invoices.FirstOrDefault(i => i.InvoiceID == invoiceId);
+            if (invoice == null)
+                throw new Exception("Not Found");
 
             Context.Invoices.Remove(invoice);
-            await Context.SaveChangesAsync();
-            return true;
+            Context.SaveChangesAsync();
         }
 
         #endregion

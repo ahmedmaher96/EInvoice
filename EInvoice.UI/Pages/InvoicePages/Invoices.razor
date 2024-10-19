@@ -1,0 +1,145 @@
+﻿@page "/Invoice"
+@inject HttpClient Http
+@inject GeneralService service
+
+<div class="row my-2">
+    <div class="col-md-8">
+        <h3>Invoices</h3>
+    </div>
+    <div class="col-md-4 text-end">
+        <NavLink href="/Invoice/Form" class="btn btn-success">
+            <i class="bi bi-file-earmark-plus-fill"></i> Add Invoice
+        </NavLink>
+    </div>
+</div>
+
+<div class="container my-3">
+    <EditForm Model="@searchParameters" OnValidSubmit="HandleSearch">
+        <div class="my-2">
+            <InputText @bind-Value="searchParameters.Code" class="form-control" placeholder="Invoice Code">
+            </InputText>
+        </div>
+        <div class="my-2">
+            <select @bind="searchParameters.Type" class="form-select">
+                <option value="">Select Type</option>
+                @foreach (var type in Enum.GetValues(typeof(InvoiceType)))
+                {
+                    <option value="@((int)type)">@type.ToString()</option>
+                }
+            </select>
+        </div>
+        <div class="my-2">
+            <InputDate @bind-Value="searchParameters.IssuedDate" class="form-control" placeholder="Issued Date" />
+        </div>
+        <div class="my-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Search
+            </button>
+        </div>
+    </EditForm>
+
+    <br />
+    <br />
+
+    @if (invoices != null)
+    {
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Ivoice Code</th>
+                    <th>Invoice Type</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                @foreach (var invoice in invoices)
+                {
+                    <InvoiceList InvoiceCode="@invoice.Code"
+                                 InvoiceType="@invoice.Type"
+                                 InvoiceDate="@invoice.DateTimeInssured"
+                                 InvoiceID="@invoice.InvoiceID"
+                                 _singleInvoice="singleInvoice"
+                                 OnEdit="EditInvoice"
+                                 OnDelete="DeleteInvoice">
+                    </InvoiceList>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="h3 alert alert-warning">There are no Invoices yet ..</p>
+    }
+</div>
+
+@code {
+    private List<Invoice> invoices = new List<Invoice>();
+    public Invoice singleInvoice { get; set; }
+    private InvoiceSearchParams searchParameters = new InvoiceSearchParams();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchInvoices();
+    }
+
+    private async Task HandleSearch()
+    {
+        await FetchInvoices();
+    }
+
+    private async Task FetchInvoices()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<List<Invoice>>($"api/Invoice?Code={searchParameters.Code}&type={searchParameters.Type}&dateTime={searchParameters.IssuedDate}");
+            invoices = response ?? new List<Invoice>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching invoices: {ex.Message}");
+            invoices = new List<Invoice>();
+        }
+    }
+
+    private async Task DeleteInvoice(int id)
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"api/Invoice/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                invoices = invoices.Where(c => c.InvoiceID == id).ToList();
+            }
+            else
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during deletion: {ex.Message}");
+        }
+    }
+
+    public async Task EditInvoice(int id)
+    {
+        try
+        {
+            singleInvoice = invoices.FirstOrDefault(i => i.InvoiceID == id);
+
+            if (singleInvoice == null)
+            {
+                singleInvoice = await Http.GetFromJsonAsync<Invoice>($"api/Invoice/Form/{id}");
+            }
+
+            service.SetInvoice(singleInvoice!);
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching invoices: {ex.Message}");
+        }
+    }
+}

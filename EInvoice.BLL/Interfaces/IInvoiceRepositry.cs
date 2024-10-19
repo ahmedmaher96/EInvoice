@@ -18,7 +18,7 @@ namespace EInvoice.BLL.Interfaces
 
         Task<IEnumerable<Invoice>> GetAllAsync();
 
-        Task<IEnumerable<Invoice>> GetList(string filterCode, int filterType, DateTime filterDate);
+        Task<IEnumerable<Invoice>> GetList(string filterCode, InvoiceType? filterType, DateTime? filterDate);
 
         Task<Invoice> GetInvoiceByIdAsync(int invoiceId);
 
@@ -26,7 +26,7 @@ namespace EInvoice.BLL.Interfaces
 
         Task<Invoice> UpdateInvoiceAsync(Invoice invoice);
 
-        Task<bool> DeleteInvoiceAsync(int invoiceId);
+        void DeleteInvoice(int invoiceId);
 
         #endregion
 

@@ -6,6 +6,7 @@ using EInvoice.BLL.Repositries;
 using EInvoice.DAL.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace EInvoice.API.Controllers
 {
@@ -31,15 +32,28 @@ namespace EInvoice.API.Controllers
 
         #region Invoice Endpoints
 
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAllInvoices()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Invoice>>> GetAllInvoices([FromQuery] string? Code = null, InvoiceType? type = null, DateTime? dateTime = null)
         {
-            var invoices = await _invoiceRepository.GetAllAsync();
+            IEnumerable<Invoice> invoices;
+
+            if (Code == null && type == null && dateTime == null)
+            {
+                invoices = await _invoiceRepository.GetAllAsync();
+            }
+            else
+            {
+                invoices = await _invoiceRepository.GetList(Code, type, dateTime);
+                if (invoices == null || !invoices.Any())
+                {
+                    throw new Exception("Not Found");
+                }
+            }
             return Ok(invoices);
         }
 
-        [HttpGet("GetById/{id}")]
-        public async Task<IActionResult> GetInvoiceById(int id)
+        [HttpGet("Form/{id}")]
+        public async Task<ActionResult<Invoice>> GetInvoiceById(int id)
         {
             var invoice = await _invoiceRepository.GetInvoiceByIdAsync(id);
             if (invoice == null) return NotFound();
@@ -47,7 +61,7 @@ namespace EInvoice.API.Controllers
             return Ok(invoice);
         }
 
-        [HttpPost("Add")]
+        [HttpPost("Form")]
         public async Task<IActionResult> AddInvoice([FromBody] InvoiceDTO invoiceDto)
         {
             if (!ModelState.IsValid)
@@ -57,7 +71,7 @@ namespace EInvoice.API.Controllers
             return Ok();
         }
 
-        [HttpPut("Update/{id}")]
+        [HttpPut("Form/{id}")]
         public async Task<IActionResult> UpdateInvoice(int id, [FromBody] InvoiceDTO invoiceDto)
         {
             if (!ModelState.IsValid)
@@ -71,12 +85,10 @@ namespace EInvoice.API.Controllers
             return Ok(updatedInvoice);
         }
 
-        [HttpDelete("Delete/{id}")]
-        public async Task<IActionResult> DeleteInvoice(int id)
+        [HttpDelete("{id}")]
+        public IActionResult DeleteInvoice(int id)
         {
-            var result = await _invoiceRepository.DeleteInvoiceAsync(id);
-            if (!result) return NotFound();
-
+            _invoiceRepository.DeleteInvoice(id);
             return Ok();
         }
 
@@ -92,16 +104,6 @@ namespace EInvoice.API.Controllers
 
             return Ok(invoiceItem);
         }
-
-        //[HttpPost("AddItem")]
-        //public async Task<IActionResult> AddInvoiceItem([FromBody] InvoiceItemDTO invoiceItemDto)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-
-        //    var createdItem = await _invoiceRepository.AddItemToInvoiceAsync(invoiceItemDto);
-        //    return CreatedAtAction(nameof(GetInvoiceItemById), new { id = createdItem.ItemInvoiceID }, createdItem);
-        //}
 
         [HttpPut("UpdateItem/{id}")]
         public async Task<IActionResult> UpdateInvoiceItem(int id, [FromBody] InvoiceItemDTO invoiceItemDto)
@@ -137,33 +139,12 @@ namespace EInvoice.API.Controllers
             return Ok(itemTaxes);
         }
 
-        //[HttpPost("AddTaxToItem")]
-        //public async Task<IActionResult> AddTaxToInvoiceItem([FromBody] InvoiceItemTaxDTO invoiceItemTaxDto)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-
-        //    var createdTax = await _invoiceRepository.AddTaxToInvoiceItemAsync(invoiceItemTaxDto);
-        //    return CreatedAtAction(nameof(GetInvoiceItemById), new { id = createdTax.InvoiceItemTaxID }, createdTax);
-        //}
-
-        //[HttpPut("UpdateTax/{id}")]
-        //public async Task<IActionResult> UpdateInvoiceItemTax(int id, [FromBody] InvoiceItemTaxDTO invoiceItemTaxDto)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-
-        //    var updatedTax = await _invoiceRepository.UpdateInvoiceItemTaxAsync(_mapper.Map<InvoiceItemTax>(invoiceItemTaxDto));
-        //    if (updatedTax == null) return NotFound();
-
-        //    return Ok(updatedTax);
-        //}
-
         [HttpDelete("DeleteTax/{id}")]
         public async Task<IActionResult> DeleteInvoiceItemTax(int id)
         {
             var result = await _invoiceRepository.DeleteInvoiceItemTaxAsync(id);
-            if (!result) return NotFound();
+            if (!result)
+                return NotFound();
 
             return Ok();
         }

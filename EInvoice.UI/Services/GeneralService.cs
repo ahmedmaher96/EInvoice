@@ -13,6 +13,7 @@ namespace EInvoice.UI.Services
         public Item Item { get; private set; }
         public Tax Tax { get; private set; }
         public Customer Customer { get; private set; }
+        public Invoice Invoice { get; private set; }
 
         #endregion
 
@@ -31,6 +32,11 @@ namespace EInvoice.UI.Services
         public void SetCustomer(Customer customer)
         {
             Customer = customer;
+        }
+
+        public void SetInvoice(Invoice invoice)
+        {
+            Invoice = invoice;
         }
 
         #endregion

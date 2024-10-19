@@ -1,17 +1,41 @@
 ﻿<tr>
-    <td>Invoice Code</td>
-    <td>Invoice Type</td>
-    <td>Date</td>
+    <td>@InvoiceCode</td>
+    <td>@InvoiceType.ToString()</td>
+    <td>@InvoiceDate.ToString("dd/MM/yyyy")</td>
     <td>
-        <button class="btn btn-outline-warning">
+        <button class="btn btn-outline-warning" @onclick="NavigateToItemForm">
             <i class="bi bi-pencil-square"></i>
         </button>
-        <a class="btn btn-outline-danger">
+        <a class="btn btn-outline-danger" @onclick="() => OnDelete.InvokeAsync(InvoiceID)">
             <i class="bi bi-trash"></i>
         </a>
     </td>
 </tr>
 
-@code {
 
+@code {
+    [Parameter]
+    public string InvoiceCode { get; set; }
+    [Parameter]
+    public InvoiceType InvoiceType { get; set; }
+    [Parameter]
+    public DateTime InvoiceDate { get; set; }
+    [Parameter]
+    public int InvoiceID { get; set; }
+    [Parameter]
+    public Invoice _singleInvoice { get; set; }
+    [Parameter]
+    public EventCallback<int> OnDelete { get; set; }
+    [Parameter]
+    public EventCallback<int> OnEdit { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    private void NavigateToItemForm()
+    {
+        OnEdit.InvokeAsync(InvoiceID);
+        NavigationManager.NavigateTo($"/Invoice/Form/{InvoiceID}");
+        StateHasChanged();
+    }
 }
