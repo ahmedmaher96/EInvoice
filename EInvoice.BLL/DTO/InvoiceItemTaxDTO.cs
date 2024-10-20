@@ -12,6 +12,7 @@ namespace EInvoice.BLL.DTO
         #region Properties
 
         public int TaxId { get; set; }
+        public TaxDTO Tax { get; set; }
 
         public decimal TaxAmount { get; set; }
 

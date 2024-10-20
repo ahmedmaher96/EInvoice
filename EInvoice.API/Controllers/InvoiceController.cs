@@ -7,6 +7,8 @@ using EInvoice.DAL.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace EInvoice.API.Controllers
 {
@@ -16,14 +18,16 @@ namespace EInvoice.API.Controllers
 
         private readonly IInvoiceRepositry _invoiceRepository;
         private readonly IMapper _mapper;
+        private readonly JsonSerializerOptions _jsonOptions;
 
         #endregion
 
         #region Constructors
-        public InvoiceController(IInvoiceRepositry invoiceRepository, IMapper mapper)
+        public InvoiceController(IInvoiceRepositry invoiceRepository, IMapper mapper, JsonSerializerOptions jsonOptions)
         {
             _invoiceRepository = invoiceRepository;
             _mapper = mapper;
+            _jsonOptions = jsonOptions;
         }
 
         #endregion
@@ -49,7 +53,10 @@ namespace EInvoice.API.Controllers
                     throw new Exception("Not Found");
                 }
             }
-            return Ok(invoices);
+
+            var jsonString = JsonSerializer.Serialize(invoices, _jsonOptions);
+
+            return Content(jsonString, "application/json");
         }
 
         [HttpGet("Form/{id}")]
@@ -58,7 +65,9 @@ namespace EInvoice.API.Controllers
             var invoice = await _invoiceRepository.GetInvoiceByIdAsync(id);
             if (invoice == null) return NotFound();
 
-            return Ok(invoice);
+            var jsonString = JsonSerializer.Serialize(invoice, _jsonOptions);
+
+            return Content(jsonString, "application/json");
         }
 
         [HttpPost("Form")]

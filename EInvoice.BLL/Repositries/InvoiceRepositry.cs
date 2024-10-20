@@ -37,17 +37,23 @@ namespace EInvoice.BLL.Repositries
 
         public IQueryable<Invoice> Query()
         {
-            return Context.Invoices.AsQueryable();
+            return Context.Invoices.Include(i=>i.Customer)
+                                   .Include(i => i.InvoiceItems)
+                                        .ThenInclude(ii => ii.Item)
+                                   .Include(i => i.InvoiceItems)
+                                        .ThenInclude(ii => ii.InvoiceItemTaxes)
+                                        .ThenInclude(iit => iit.Tax)
+                                   .AsQueryable();
         }
 
         public async Task<IEnumerable<Invoice>> GetAllAsync()
         {
-            return await Context.Invoices.ToListAsync();
+            return await Query().ToListAsync();
         }
 
         public async Task<IEnumerable<Invoice>> GetList(string filterCode, InvoiceType? filterType, DateTime? filterDate)
         {
-            return await Context.Invoices.Where(i => i.Code.Contains(filterCode)
+            return await Query().Where(i => i.Code.Contains(filterCode)
                                                 || i.Type.Equals(filterType)
                                                 || i.DateTimeInssured.Equals(filterDate))
                                         .ToListAsync();
@@ -55,7 +61,7 @@ namespace EInvoice.BLL.Repositries
 
         public async Task<Invoice> GetInvoiceByIdAsync(int invoiceId)
         {
-            return await Context.Invoices.FindAsync(invoiceId);
+            return await Query().FirstOrDefaultAsync(i => i.InvoiceID == invoiceId);
         }
 
         public async Task<Invoice> AddInvoiceAsync(InvoiceDTO invoicedto)
@@ -94,12 +100,20 @@ namespace EInvoice.BLL.Repositries
 
         public void DeleteInvoice(int invoiceId)
         {
-            var invoice = Context.Invoices.FirstOrDefault(i => i.InvoiceID == invoiceId);
-            if (invoice == null)
-                throw new Exception("Not Found");
+            var invoice = Context.Invoices.Include(i => i.InvoiceItems)
+                                          .ThenInclude(ii => ii.InvoiceItemTaxes)
+                                          .FirstOrDefault(i => i.InvoiceID == invoiceId);
+            if (invoice != null)
+            {
+                foreach (var invoiceItem in invoice.InvoiceItems)
+                {
+                    Context.InvoiceItemTaxes.RemoveRange(invoiceItem.InvoiceItemTaxes);
+                }
 
-            Context.Invoices.Remove(invoice);
-            Context.SaveChangesAsync();
+                Context.InvoiceItems.RemoveRange(invoice.InvoiceItems);
+                Context.Invoices.Remove(invoice);
+                Context.SaveChangesAsync();
+            }
         }
 
         #endregion

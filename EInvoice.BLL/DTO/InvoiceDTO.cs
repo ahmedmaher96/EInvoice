@@ -24,6 +24,8 @@ namespace EInvoice.BLL.DTO
 
         public ICollection<InvoiceItemDTO> InvoiceItems { get; set; }
 
+        public decimal NetAmount => InvoiceItems?.Sum(ii => ii.ItemNetAmount) ?? 0;
+
         #endregion
     }
 }

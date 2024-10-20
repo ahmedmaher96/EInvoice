@@ -92,8 +92,14 @@
     {
         try
         {
-            var response = await Http.GetFromJsonAsync<List<Invoice>>($"api/Invoice?Code={searchParameters.Code}&type={searchParameters.Type}&dateTime={searchParameters.IssuedDate}");
-            invoices = response ?? new List<Invoice>();
+            var response = await Http.GetAsync($"api/Invoice?Code={searchParameters.Code}&type={searchParameters.Type}&dateTime={searchParameters.IssuedDate}");
+            response.EnsureSuccessStatusCode();
+            var responseBody = await response.Content.ReadAsStringAsync();
+            invoices = JsonSerializer.Deserialize<List<Invoice>>(responseBody, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    ReferenceHandler = ReferenceHandler.Preserve
+                }) ?? new List<Invoice>();
         }
         catch (Exception ex)
         {
@@ -109,7 +115,8 @@
             var response = await Http.DeleteAsync($"api/Invoice/{id}");
             if (response.IsSuccessStatusCode)
             {
-                invoices = invoices.Where(c => c.InvoiceID == id).ToList();
+                invoices = invoices.Where(c => c.InvoiceID != id).ToList();
+                StateHasChanged();
             }
             else
             {
@@ -130,7 +137,14 @@
 
             if (singleInvoice == null)
             {
-                singleInvoice = await Http.GetFromJsonAsync<Invoice>($"api/Invoice/Form/{id}");
+                var response = await Http.GetAsync($"api/Invoice/Form/{id}");
+                response.EnsureSuccessStatusCode();
+                var responseBody = await response.Content.ReadAsStringAsync();
+                singleInvoice = JsonSerializer.Deserialize<Invoice>(responseBody, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        ReferenceHandler = ReferenceHandler.Preserve
+                    }) ?? new Invoice();
             }
 
             service.SetInvoice(singleInvoice!);

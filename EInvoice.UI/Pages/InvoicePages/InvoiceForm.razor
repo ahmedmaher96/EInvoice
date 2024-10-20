@@ -10,6 +10,19 @@
     <ValidationSummary />
     <div class="row">
         <div class="col-lg-4 border-end border-1 border-dark">
+            <div class="my-3 text-center">
+                <label>
+                    <strong>Date:</strong>
+                </label>
+                <label>
+                    @_invoice.DateTimeInssured.ToString("dd MMMM-yyyy")
+                </label>
+                <label>
+                    <strong>
+                        @_invoice.DateTimeInssured.ToString("hh:mm:ss")
+                    </strong>
+                </label>
+            </div>
             <div class="my-3">
                 <InputText @bind-Value="_invoice.Code" class="form-control" placeholder="Invoice Code" />
             </div>
@@ -22,11 +35,9 @@
                     }
                 </select>
             </div>
-
             <div class="my-3">
-                <InputText @bind-value="_invoice.DateTimeInssured" class="form-control" placeholder="Invoice Inssued Date" />
+                Customer
             </div>
-
         </div>
 
 
@@ -34,7 +45,7 @@
             <div class="text-end mb-3">
                 <button class="btn btn-success bi-file-earmark-plus-fill"> Add Items</button>
             </div>
-            <div class="container my-2 py-2 overflow-auto" style="background-color: #F9F4F8; height: 100%;">
+            <div class="container mt-2 pt-2 overflow-auto" style="background-color: #F9F4F8; height: 100%;">
                 @if (InvoiceID == null)
                 {
                     <div class="text-center">
@@ -55,7 +66,8 @@
                                 </div>
                                 <div class="col-xs-4 col-sm-4 col-md-4 text-right">
                                     <p>
-                                        <em>Date: @_invoice.DateTimeInssured.ToString("dd/MMMM/yyyy")</em>
+                                        <strong>Date: </strong>
+                                        <em>@_invoice.DateTimeInssured.ToString("dd-MM-yyyy | hh:mm tt")</em>
                                     </p>
                                 </div>
                             </div>
@@ -71,6 +83,7 @@
                                     }
                                 </div>
                                 <table class="table recieptbg">
+                                    @* Invoice Head *@
                                     <thead>
                                         <tr>
                                             <th>Product</th>
@@ -79,33 +92,46 @@
                                             <th class="text-center">Total</th>
                                         </tr>
                                     </thead>
+
+                                    @* Invoice Table *@
                                     <tbody>
-                                        @foreach (var invoiceItem in _invoice.InvoiceItems)
+                                        @if (_invoice.InvoiceItems != null)
                                         {
-                                            <tr>
-                                                <td class="col-md-9"><p><em>InvoiceItem.Item</em></p></td>
-                                                <td class="col-md-1" style="text-align: center"> InvoiceItem.Quantity </td>
-                                                <td class="col-md-1 text-center">$8</td>
-                                                <td class="col-md-1 text-center">$8</td>
-                                            </tr>
+                                            @foreach (var invoiceItem in _invoice.InvoiceItems)
+                                            {
+                                                <tr>
+                                                    <td class="col-md-9"><p><em>@(invoiceItem.Item.Name ?? "Item")</em></p></td>
+                                                    <td class="col-md-1" style="text-align: center"> @invoiceItem.Quantity </td>
+                                                    <td class="col-md-1 text-center">@invoiceItem.Amount</td>
+                                                    <td class="col-md-1 text-center">@invoiceItem.Total</td>
+                                                </tr>
+                                                @foreach (var invoiceItemTax in invoiceItem.InvoiceItemTaxes)
+                                                {
+
+                                                    <tr>
+                                                        <td>   </td>
+                                                        <td colspan="2" class="text-right"><p><strong>@(invoiceItemTax.Tax.Name ?? "Tax")</strong></p></td>
+                                                        <td class="text-center text-danger"><p><strong>@invoiceItemTax.TaxAmount</strong></p></td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                    <td>
+                                                        <button type="submit" class="btn btn-warning">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                        </button>
+                                                        <button type="submit" class="btn btn-danger">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                    <td colspan="2" class="text-right"><p><strong>Net Amount: </strong></p></td>
+                                                    <td class="text-center text-danger"><p><strong>@invoiceItem.ItemNetAmount</strong></p></td>
+                                                </tr>
+                                            }
                                         }
                                         <tr>
-                                            <td colspan="2">
-                                                <button>
-                                                    Edit
-                                                </button>
-                                                <button>
-                                                    Delete
-                                                </button>
-                                            </td>
-                                            <td colspan="2">
-                                            </td>
-                                        </tr>
-                                        <tr class="border-top border-black">
                                             <td>   </td>
-                                            <td>   </td>
-                                            <td class="text-right"><h4><strong>Total: </strong></h4></td>
-                                            <td class="text-center text-danger"><h4><strong>$31.53</strong></h4></td>
+                                            <td colspan="2" class="text-right"><h4><strong>Total: </strong></h4></td>
+                                            <td class="text-center text-danger"><h4><strong>@_invoice.NetAmount</strong></h4></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -116,12 +142,23 @@
                 }
             </div>
         </div>
+
     </div>
     <div class="text-start">
-        <button type="submit" class="btn btn-success">
-            <i class="bi bi-file-earmark-plus-fill"></i> Save
-        </button>
-        <button class="btn btn-info">
+        @if (InvoiceID.HasValue)
+        {
+
+            <button type="submit" class="btn btn-warning">
+                <i class="bi bi-arrow-repeat"></i> Update
+            </button>
+        }
+        else
+        {
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-file-earmark-plus-fill"></i> Save
+            </button>
+        }
+        <button class="btn btn-info mx-2">
             <i class="bi bi-printer-fill"></i> Print
         </button>
         <NavLink href="/Invoice" class="btn btn-secondary">
@@ -138,13 +175,20 @@
     [Parameter]
     public int? InvoiceID { get; set; }
 
-
     protected override async Task OnParametersSetAsync()
     {
         if (InvoiceID.HasValue)
         {
             _invoice = new InvoiceDTO();
-            _invoice = await Http.GetFromJsonAsync<InvoiceDTO>($"api/Invoice/Form/{InvoiceID.Value}");
+            var response = await Http.GetAsync($"api/Invoice/Form/{InvoiceID.Value}");
+            response.EnsureSuccessStatusCode();
+
+            var responseBody = await response.Content.ReadAsStringAsync();
+            _invoice = JsonSerializer.Deserialize<InvoiceDTO>(responseBody, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    ReferenceHandler = ReferenceHandler.Preserve
+                })!;
             _invoiceItems = _invoice.InvoiceItems.Select(item => new InvoiceItemDTO
                 {
                     ItemID = item.ItemID,
@@ -173,6 +217,7 @@
         }
         else
         {
+            _invoice.DateTimeInssured = DateTime.Now;
             await Save();
         }
         StateHasChanged();
@@ -185,7 +230,7 @@
             var response = await Http.PostAsJsonAsync("api/Invoice/Form", _invoice);
             if (response.IsSuccessStatusCode)
             {
-                var newInvoice = await response.Content.ReadFromJsonAsync<InvoiceDTO>();
+                var newInvoice = await response.Content.ReadFromJsonAsync<Invoice>();
             }
             else
             {
@@ -206,7 +251,7 @@
             var response = await Http.PutAsJsonAsync($"api/Invoice/Form/{InvoiceID}", _invoice);
             if (response.IsSuccessStatusCode)
             {
-                var newInvoice = await response.Content.ReadFromJsonAsync<InvoiceDTO>();
+                var newInvoice = await response.Content.ReadFromJsonAsync<Invoice>();
             }
             else
             {

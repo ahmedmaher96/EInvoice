@@ -175,8 +175,7 @@ namespace EInvoice.DAL.Migrations
                 {
                     b.HasOne("EInvoice.DAL.Models.Customer", "Customer")
                         .WithMany("Invoices")
-                        .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("CustomerID");
 
                     b.Navigation("Customer");
                 });
@@ -185,7 +184,8 @@ namespace EInvoice.DAL.Migrations
                 {
                     b.HasOne("EInvoice.DAL.Models.Invoice", "Invoice")
                         .WithMany("InvoiceItems")
-                        .HasForeignKey("InvoiceId");
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("EInvoice.DAL.Models.Item", "Item")
                         .WithMany("InvoiceItems")
@@ -200,7 +200,8 @@ namespace EInvoice.DAL.Migrations
                 {
                     b.HasOne("EInvoice.DAL.Models.InvoiceItem", "InvoiceItem")
                         .WithMany("InvoiceItemTaxes")
-                        .HasForeignKey("InvoiceItemID");
+                        .HasForeignKey("InvoiceItemID")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("EInvoice.DAL.Models.Tax", "Tax")
                         .WithMany("InvoiceItemTaxes")

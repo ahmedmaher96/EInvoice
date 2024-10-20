@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EInvoice.DAL.Migrations
 {
     [DbContext(typeof(EInvoiceDBContext))]
-    [Migration("20241019162321_modification222")]
-    partial class modification222
+    [Migration("20241020105508_IntialCreate")]
+    partial class IntialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -178,8 +178,7 @@ namespace EInvoice.DAL.Migrations
                 {
                     b.HasOne("EInvoice.DAL.Models.Customer", "Customer")
                         .WithMany("Invoices")
-                        .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("CustomerID");
 
                     b.Navigation("Customer");
                 });
@@ -188,7 +187,8 @@ namespace EInvoice.DAL.Migrations
                 {
                     b.HasOne("EInvoice.DAL.Models.Invoice", "Invoice")
                         .WithMany("InvoiceItems")
-                        .HasForeignKey("InvoiceId");
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("EInvoice.DAL.Models.Item", "Item")
                         .WithMany("InvoiceItems")
@@ -203,7 +203,8 @@ namespace EInvoice.DAL.Migrations
                 {
                     b.HasOne("EInvoice.DAL.Models.InvoiceItem", "InvoiceItem")
                         .WithMany("InvoiceItemTaxes")
-                        .HasForeignKey("InvoiceItemID");
+                        .HasForeignKey("InvoiceItemID")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("EInvoice.DAL.Models.Tax", "Tax")
                         .WithMany("InvoiceItemTaxes")

@@ -40,7 +40,7 @@ namespace EInvoice.DAL.Models
 
         #region Calculated Properties
         
-        public decimal ItemNetAmount => InvoiceItems?.Sum(ii => ii.TotalAmount) ?? 0;
+        public decimal NetAmount => InvoiceItems?.Sum(ii => ii.ItemNetAmount) ?? 0;
 
         #endregion
 

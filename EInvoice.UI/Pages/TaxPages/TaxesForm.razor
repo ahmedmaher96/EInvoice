@@ -68,6 +68,7 @@
             await Save();
         }
         StateHasChanged();
+        NavigateToTaxList();
     }
 
     private async Task Save()
@@ -110,5 +111,14 @@
         {
             Console.WriteLine($"Error saving tax: {ex.Message}");
         }
+    }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    private void NavigateToTaxList()
+    {
+        NavigationManager.NavigateTo($"/Tax");
+        StateHasChanged();
     }
 }

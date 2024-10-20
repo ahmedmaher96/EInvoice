@@ -7,6 +7,8 @@ using EInvoice.BLL.Repositries;
 using EInvoice.BLL.Repositries.Generic;
 using EInvoice.DAL.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace EInvoice.API
 {
@@ -21,6 +23,11 @@ namespace EInvoice.API
             builder.Services.AddDbContext<EInvoiceDBContext>(Options =>
             {
                 Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+            builder.Services.AddSingleton(new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve,
             });
             //builder.Services.AddControllers()
             //                .AddJsonOptions(options =>

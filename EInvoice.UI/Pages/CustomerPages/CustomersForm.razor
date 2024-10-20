@@ -68,6 +68,7 @@
             await Save();
         }
         StateHasChanged();
+        NavigateToCustomerList();
     }
 
     private async Task Save()
@@ -110,5 +111,14 @@
         {
             Console.WriteLine($"Error saving customer: {ex.Message}");
         }
+    }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    private void NavigateToCustomerList()
+    {
+        NavigationManager.NavigateTo($"/Customer");
+        StateHasChanged();
     }
 }
