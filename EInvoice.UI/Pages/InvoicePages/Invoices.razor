@@ -1,6 +1,7 @@
 ﻿@page "/Invoice"
 @inject HttpClient Http
 @inject GeneralService service
+@inject InvoiceService invoiceService
 
 <div class="row my-2">
     <div class="col-md-8">
@@ -92,14 +93,7 @@
     {
         try
         {
-            var response = await Http.GetAsync($"api/Invoice?Code={searchParameters.Code}&type={searchParameters.Type}&dateTime={searchParameters.IssuedDate}");
-            response.EnsureSuccessStatusCode();
-            var responseBody = await response.Content.ReadAsStringAsync();
-            invoices = JsonSerializer.Deserialize<List<Invoice>>(responseBody, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    ReferenceHandler = ReferenceHandler.Preserve
-                }) ?? new List<Invoice>();
+            invoices = await invoiceService.GetInvoices(searchParameters.Code, searchParameters.Type, searchParameters.IssuedDate);
         }
         catch (Exception ex)
         {
@@ -112,16 +106,9 @@
     {
         try
         {
-            var response = await Http.DeleteAsync($"api/Invoice/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                invoices = invoices.Where(c => c.InvoiceID != id).ToList();
-                StateHasChanged();
-            }
-            else
-            {
-                var errorMessage = await response.Content.ReadAsStringAsync();
-            }
+            await invoiceService.DeleteInvoice(id);
+            invoices = invoices.Where(c => c.InvoiceID != id).ToList();
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -129,7 +116,7 @@
         }
     }
 
-    public async Task EditInvoice(int id)
+    private async Task EditInvoice(int id)
     {
         try
         {
@@ -137,14 +124,7 @@
 
             if (singleInvoice == null)
             {
-                var response = await Http.GetAsync($"api/Invoice/Form/{id}");
-                response.EnsureSuccessStatusCode();
-                var responseBody = await response.Content.ReadAsStringAsync();
-                singleInvoice = JsonSerializer.Deserialize<Invoice>(responseBody, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true,
-                        ReferenceHandler = ReferenceHandler.Preserve
-                    }) ?? new Invoice();
+                singleInvoice = await invoiceService.EditInvoice(id);
             }
 
             service.SetInvoice(singleInvoice!);

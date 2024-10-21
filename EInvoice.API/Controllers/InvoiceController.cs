@@ -103,63 +103,6 @@ namespace EInvoice.API.Controllers
 
         #endregion
 
-        #region InvoiceItem Endpoints
-
-        [HttpGet("GetInvoiceItemById/{id}")]
-        public async Task<IActionResult> GetInvoiceItemById(int id)
-        {
-            var invoiceItem = await _invoiceRepository.GetInvoiceItemByIdAsync(id);
-            if (invoiceItem == null) return NotFound();
-
-            return Ok(invoiceItem);
-        }
-
-        [HttpPut("UpdateItem/{id}")]
-        public async Task<IActionResult> UpdateInvoiceItem(int id, [FromBody] InvoiceItemDTO invoiceItemDto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var updatedItem = await _invoiceRepository.UpdateInvoiceItemAsync(id, invoiceItemDto);
-            if (updatedItem == null) return NotFound();
-
-            return Ok(updatedItem);
-        }
-
-        [HttpDelete("DeleteItem/{id}")]
-        public async Task<IActionResult> DeleteInvoiceItem(int id)
-        {
-            var result = await _invoiceRepository.DeleteInvoiceItemAsync(id);
-            if (!result) return NotFound();
-
-            return Ok();
-        }
-
-        #endregion
-
-        #region InvoiceItemTax Endpoints
-
-        [HttpGet("GetInvoiceItemTax")]
-        public async Task<IActionResult> GetInvoiceItemTaxes(int id)
-        {
-            var itemTaxes = await _invoiceRepository.GetInvoiceItemTaxes(id);
-            if (itemTaxes == null)
-                return NotFound();
-            return Ok(itemTaxes);
-        }
-
-        [HttpDelete("DeleteTax/{id}")]
-        public async Task<IActionResult> DeleteInvoiceItemTax(int id)
-        {
-            var result = await _invoiceRepository.DeleteInvoiceItemTaxAsync(id);
-            if (!result)
-                return NotFound();
-
-            return Ok();
-        }
-
-        #endregion
-
         #endregion
 
     }

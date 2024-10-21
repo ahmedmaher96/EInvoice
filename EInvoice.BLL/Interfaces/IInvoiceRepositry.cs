@@ -30,29 +30,5 @@ namespace EInvoice.BLL.Interfaces
 
         #endregion
 
-        #region InvoiceItem
-
-        Task<InvoiceItem> GetInvoiceItemByIdAsync(int id);
-
-        //Task<InvoiceItem> AddItemToInvoiceAsync(InvoiceItemDTO item);
-
-        Task<InvoiceItem> UpdateInvoiceItemAsync(int id, InvoiceItemDTO item);
-
-        Task<bool> DeleteInvoiceItemAsync(int itemInvoiceId);
-
-        #endregion
-
-        #region InvoiceItemTax
-
-        Task<IEnumerable<InvoiceItemTax>> GetInvoiceItemTaxes(int invoiceItemId);
-
-        //Task<InvoiceItemTax> AddTaxToInvoiceItemAsync(InvoiceItemTaxDTO itemTaxdto);
-
-        //Task<InvoiceItemTax> UpdateInvoiceItemTaxAsync(InvoiceItemTax itemTaxdto);
-
-        Task<bool> DeleteInvoiceItemTaxAsync(int itemTaxId); 
-
-        #endregion
-
     }
 }

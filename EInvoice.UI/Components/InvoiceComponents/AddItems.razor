@@ -1,0 +1,131 @@
+﻿@inject InvoiceService invoiceService
+
+<div class="p-2 m-auto">
+
+    <h4>Item</h4>
+
+    <div class="my-1">
+        <select @bind="InvoiceItem.ItemID" class="form-select">
+            <option value="0">Select Item</option>
+            @if (_item.Any())
+            {
+                @foreach (var item in _item)
+                {
+                    <option value="@item.ItemID">@($"{item.Code} - {item.Name}")</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="my-3">
+        <input type="text" class="form-control" @bind="InvoiceItem.Amount" placeholder="Item Amount" />
+    </div>
+    <div class="my-3">
+        <input type="text" class="form-control" @bind="InvoiceItem.Quantity" placeholder="Item Quantity" />
+    </div>
+
+    <hr />
+
+    <div class="row mt-3">
+        <div class="col-6">
+            <h4>Taxes</h4>
+        </div>
+
+        <div class="col-6">
+            <div class="text-end">
+                <a class="btn btn-success" @onclick="AddRow">Add Tax</a>
+            </div>
+        </div>
+    </div>
+
+    <table class="table my-1">
+        <tbody>
+            @foreach (var row in taxRows)
+            {
+                <tr>
+                    <td>
+                        <select @bind="row.TaxID" class="form-select">
+                            <option value="0">Select Tax</option>
+                            @if (_tax.Any())
+                            {
+                                @foreach (var tax in _tax)
+                                {
+                                    <option value="@tax.TaxID">@($"{tax.Code} - {tax.Name}")</option>
+                                }
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" @bind="row.TaxAmount" placeholder="Tax Amount" />
+                    </td>
+                    <td>
+                        <a class="btn btn-outline-danger" @onclick="() => RemoveRow(row)">
+                            <i class="bi bi-x-circle-fill"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+
+    private List<TaxRow> taxRows = new List<TaxRow>();
+    private List<Tax> _tax = new List<Tax>();
+    private List<Item> _item = new List<Item>();
+
+    [Parameter]
+    public InvoiceItemDTO InvoiceItem { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _tax = await invoiceService.GetTaxes(null);
+        _item = await invoiceService.GetItems(null);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (InvoiceItem == null)
+        {
+            InvoiceItem = new InvoiceItemDTO
+                {
+                    InvoiceItemTaxes = new List<InvoiceItemTaxDTO>()
+                };
+        }
+
+        if (InvoiceItem.InvoiceItemTaxes == null)
+            InvoiceItem.InvoiceItemTaxes = new List<InvoiceItemTaxDTO>();    
+
+        InvoiceItem.InvoiceItemTaxes.Clear();
+        foreach (var Tax in taxRows)
+        {
+            var invoiceItemTax = new InvoiceItemTaxDTO()
+                {
+                    TaxId = Tax.TaxID,
+                    TaxAmount = Tax.TaxAmount
+                };
+            InvoiceItem.InvoiceItemTaxes.Add(invoiceItemTax);
+        }
+        StateHasChanged();
+    }
+
+    private void AddRow()
+    {
+        taxRows.Add(new TaxRow());
+        StateHasChanged();
+    }
+
+    private void RemoveRow(TaxRow row)
+    {
+        taxRows.Remove(row);
+        StateHasChanged();
+    }
+
+    public class TaxRow
+    {
+        public int TaxID { get; set; }
+        public decimal TaxAmount { get; set; }
+    }
+
+}

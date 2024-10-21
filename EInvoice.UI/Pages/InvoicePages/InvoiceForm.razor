@@ -35,18 +35,42 @@
                     }
                 </select>
             </div>
-            <div class="my-3">
-                Customer
-            </div>
+            @if (_invoice.Customer != null)
+            {
+                <div class="my-3">
+                    <label><strong>Customer Code:</strong> @_invoice.Customer.Code</label>
+                </div>
+                <div class="my-3">
+                    <label><strong>Customer Name:</strong> @_invoice.Customer.Name</label>
+                </div>
+            }
+            @if (InvoiceID == null)
+            {
+                <div class="my-3">
+                    <label><strong>Customer Name:</strong> Name</label>
+                </div>
+                <div class="my-3">
+                    <label><strong>Customer Name:</strong> Name</label>
+                </div>
+            }
         </div>
 
 
+
         <div class="col-lg-8" style="height: 70vh;">
-            <div class="text-end mb-3">
-                <button class="btn btn-success bi-file-earmark-plus-fill"> Add Items</button>
+
+            <div class="text-end">
+                <a class="btn btn-success bi-file-earmark-plus-fill" @onclick="ShowModal"> Add Items</a>
             </div>
+
+            <ModalComponent IsVisible="@isModalVisible"
+                            Title="Add Items"
+                            OnClose="HandleModalClose">
+                <AddItems InvoiceItem="@_invoiceItem"></AddItems>
+            </ModalComponent>
+
             <div class="container mt-2 pt-2 overflow-auto" style="background-color: #F9F4F8; height: 100%;">
-                @if (InvoiceID == null)
+                @if (InvoiceID == null && _invoice.InvoiceItems == null)
                 {
                     <div class="text-center">
                         <h4 class="fw-bold h2">Add Items</h4>
@@ -57,18 +81,24 @@
                     <div class="row">
                         <div class="well col-lg-12">
                             <div class="row">
-                                <div class="col-xs-8 col-sm-8 col-md-8">
+                                <div class="col-xs-7 col-sm-7 col-md-7">
                                     <h4>
                                         <div class="w-25">
                                             <img src="CodeZone.jpg" style="width:100%;" alt="Alternate Text" />
                                         </div>
                                     </h4>
                                 </div>
-                                <div class="col-xs-4 col-sm-4 col-md-4 text-right">
+                                <div class="col-xs-5 col-sm-5 col-md-5 text-right">
                                     <p>
                                         <strong>Date: </strong>
                                         <em>@_invoice.DateTimeInssured.ToString("dd-MM-yyyy | hh:mm tt")</em>
                                     </p>
+                                    @if (_invoice.Customer != null)
+                                    {
+                                        <p>
+                                            <strong>Code - @_invoice.Customer.Code</strong>
+                                        </p>
+                                    }
                                 </div>
                             </div>
                             <div class="row">
@@ -100,7 +130,7 @@
                                             @foreach (var invoiceItem in _invoice.InvoiceItems)
                                             {
                                                 <tr>
-                                                    <td class="col-md-9"><p><em>@(invoiceItem.Item.Name ?? "Item")</em></p></td>
+                                                    <td class="col-md-9"><p><em>@(invoiceItem.ItemID)</em></p></td>
                                                     <td class="col-md-1" style="text-align: center"> @invoiceItem.Quantity </td>
                                                     <td class="col-md-1 text-center">@invoiceItem.Amount</td>
                                                     <td class="col-md-1 text-center">@invoiceItem.Total</td>
@@ -110,7 +140,7 @@
 
                                                     <tr>
                                                         <td>   </td>
-                                                        <td colspan="2" class="text-right"><p><strong>@(invoiceItemTax.Tax.Name ?? "Tax")</strong></p></td>
+                                                        <td colspan="2" class="text-right"><p><strong>@(invoiceItemTax.TaxId)</strong></p></td>
                                                         <td class="text-center text-danger"><p><strong>@invoiceItemTax.TaxAmount</strong></p></td>
                                                     </tr>
                                                 }
@@ -144,6 +174,7 @@
         </div>
 
     </div>
+
     <div class="text-start">
         @if (InvoiceID.HasValue)
         {
@@ -171,6 +202,8 @@
 
     private InvoiceDTO _invoice = new InvoiceDTO();
     private List<InvoiceItemDTO> _invoiceItems = new List<InvoiceItemDTO>();
+    private bool isModalVisible = false;
+    private InvoiceItemDTO _invoiceItem = new InvoiceItemDTO();
 
     [Parameter]
     public int? InvoiceID { get; set; }
@@ -203,11 +236,13 @@
         }
         else
         {
-            _invoice = new InvoiceDTO();
+            _invoice = new InvoiceDTO()
+                {
+                    DateTimeInssured = DateTime.Now,
+                };
         }
         StateHasChanged();
     }
-
 
     private async Task SendData()
     {
@@ -265,4 +300,31 @@
         }
     }
 
+    private void ShowModal()
+    {
+        isModalVisible = true;
+    }
+
+    private async Task HandleModalClose(bool confirmed)
+    {
+        if (confirmed)
+        {
+            if (_invoice.InvoiceItems == null)
+            {
+                _invoice.InvoiceItems = new List<InvoiceItemDTO>()
+                {
+                    new InvoiceItemDTO(){
+
+                        InvoiceItemTaxes = new List<InvoiceItemTaxDTO>()
+                    },
+                };
+            }
+            _invoice.InvoiceItems.Add(_invoiceItem);
+            _invoiceItem = new InvoiceItemDTO();
+            StateHasChanged();
+        }
+        isModalVisible = false;
+    }
 }
+
+

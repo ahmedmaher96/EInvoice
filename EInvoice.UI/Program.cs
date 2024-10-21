@@ -12,9 +12,10 @@ namespace EInvoice.UI
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5173") });
             builder.Services.AddTransient<GeneralService>();
+            builder.Services.AddTransient<InvoiceService>();
             await builder.Build().RunAsync();
         }
     }
