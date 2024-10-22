@@ -46,7 +46,8 @@ namespace EInvoice.DAL.Context
 
                 entity.HasMany(i => i.InvoiceItems)
                         .WithOne(ii => ii.Item)
-                        .HasForeignKey(ii => ii.ItemId);
+                        .HasForeignKey(ii => ii.ItemId)
+                        .OnDelete(DeleteBehavior.SetNull);
             });
 
             // Tax
@@ -58,7 +59,8 @@ namespace EInvoice.DAL.Context
 
                 entity.HasMany(t => t.InvoiceItemTaxes)
                         .WithOne(iit => iit.Tax)
-                        .HasForeignKey(it => it.InvoiceItemTaxID);
+                        .HasForeignKey(it => it.InvoiceItemTaxID)
+                        .OnDelete(DeleteBehavior.SetNull);
             });
 
             // InvoiceItemTaxes
@@ -86,7 +88,8 @@ namespace EInvoice.DAL.Context
 
                 entity.HasMany(c => c.Invoices)
                         .WithOne(i => i.Customer)
-                        .HasForeignKey(i => i.CustomerID);
+                        .HasForeignKey(i => i.CustomerID)
+                        .OnDelete(DeleteBehavior.SetNull);
 
             });
 

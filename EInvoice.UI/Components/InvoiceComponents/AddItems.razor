@@ -40,11 +40,11 @@
 
     <table class="table my-1">
         <tbody>
-            @foreach (var row in taxRows)
+            @foreach (var row in InvoiceItem.InvoiceItemTaxes)
             {
                 <tr>
                     <td>
-                        <select @bind="row.TaxID" class="form-select">
+                        <select @bind="row.TaxId" class="form-select">
                             <option value="0">Select Tax</option>
                             @if (_tax.Any())
                             {
@@ -70,13 +70,11 @@
 </div>
 
 @code {
-
-    private List<TaxRow> taxRows = new List<TaxRow>();
     private List<Tax> _tax = new List<Tax>();
     private List<Item> _item = new List<Item>();
 
     [Parameter]
-    public InvoiceItemDTO InvoiceItem { get; set; }
+    public InvoiceItemDTO InvoiceItem { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -84,48 +82,14 @@
         _item = await invoiceService.GetItems(null);
     }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        if (InvoiceItem == null)
-        {
-            InvoiceItem = new InvoiceItemDTO
-                {
-                    InvoiceItemTaxes = new List<InvoiceItemTaxDTO>()
-                };
-        }
-
-        if (InvoiceItem.InvoiceItemTaxes == null)
-            InvoiceItem.InvoiceItemTaxes = new List<InvoiceItemTaxDTO>();    
-
-        InvoiceItem.InvoiceItemTaxes.Clear();
-        foreach (var Tax in taxRows)
-        {
-            var invoiceItemTax = new InvoiceItemTaxDTO()
-                {
-                    TaxId = Tax.TaxID,
-                    TaxAmount = Tax.TaxAmount
-                };
-            InvoiceItem.InvoiceItemTaxes.Add(invoiceItemTax);
-        }
-        StateHasChanged();
-    }
-
     private void AddRow()
     {
-        taxRows.Add(new TaxRow());
-        StateHasChanged();
+        InvoiceItem.InvoiceItemTaxes.Add(new InvoiceItemTaxDTO());
     }
 
-    private void RemoveRow(TaxRow row)
+    private void RemoveRow(InvoiceItemTaxDTO row)
     {
-        taxRows.Remove(row);
-        StateHasChanged();
-    }
-
-    public class TaxRow
-    {
-        public int TaxID { get; set; }
-        public decimal TaxAmount { get; set; }
+        InvoiceItem.InvoiceItemTaxes.Remove(row);
     }
 
 }

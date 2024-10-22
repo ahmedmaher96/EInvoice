@@ -1,8 +1,5 @@
-﻿@if (IsVisible)
-{
-    <div class="modal-backdrop fade show"></div>
-}
-<div class="modal fade @ModalClass" tabindex="-1" style="display: @(IsVisible ? "block" : "none");" role="dialog" aria-labelledby="simpleModalLabel" aria-hidden="true">
+﻿<div class="modal-backdrop fade show"></div>
+<div class="modal fade show d-block" tabindex="-1" role="dialog" aria-labelledby="simpleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -21,28 +18,23 @@
 </div>
 
 @code {
-    [Parameter] 
-    public bool IsVisible { get; set; }
-    [Parameter] 
+
+    [Parameter]
     public string Title { get; set; } = "Modal Title";
 
-    [Parameter] 
+    [Parameter]
     public EventCallback<bool> OnClose { get; set; }
-    
-    [Parameter] 
-    public RenderFragment ChildContent { get; set; }
 
-    private string ModalClass => IsVisible ? "show" : "";
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
 
     private async Task CloseModal()
     {
-        IsVisible = false;
         await OnClose.InvokeAsync(false);
     }
 
     private async Task Confirm()
     {
-        IsVisible = false;
         await OnClose.InvokeAsync(true);
     }
 }

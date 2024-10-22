@@ -2,12 +2,14 @@
 @page "/Invoice/Form/{InvoiceID:int?}"
 @inject HttpClient Http
 @inject GeneralService service
+@inject InvoiceService invoiceService
 
 <h3>Invoice Form</h3>
 
 <EditForm Model="@_invoice" OnValidSubmit="SendData">
     <DataAnnotationsValidator />
     <ValidationSummary />
+
     <div class="row">
         <div class="col-lg-4 border-end border-1 border-dark">
             <div class="my-3 text-center">
@@ -35,22 +37,27 @@
                     }
                 </select>
             </div>
-            @if (_invoice.Customer != null)
-            {
-                <div class="my-3">
-                    <label><strong>Customer Code:</strong> @_invoice.Customer.Code</label>
-                </div>
-                <div class="my-3">
-                    <label><strong>Customer Name:</strong> @_invoice.Customer.Name</label>
-                </div>
-            }
             @if (InvoiceID == null)
             {
                 <div class="my-3">
-                    <label><strong>Customer Name:</strong> Name</label>
+
+                    <select @bind="_invoice.CustomerID" class="form-select">
+                        <option value="0">Select Customer</option>
+                        @if (_customers.Any())
+                        {
+                            @foreach (var customer in _customers)
+                            {
+                                <option value="@customer.CustomerID">@($"{customer.Code} - {customer.Name}")</option>
+                            }
+                        }
+                    </select>
+
                 </div>
+            }
+            else
+            {
                 <div class="my-3">
-                    <label><strong>Customer Name:</strong> Name</label>
+                    <label><strong>Customer Name: </strong>@_customer.Code - @_customer.Name</label>
                 </div>
             }
         </div>
@@ -63,17 +70,19 @@
                 <a class="btn btn-success bi-file-earmark-plus-fill" @onclick="ShowModal"> Add Items</a>
             </div>
 
-            <ModalComponent IsVisible="@isModalVisible"
-                            Title="Add Items"
-                            OnClose="HandleModalClose">
-                <AddItems InvoiceItem="@_invoiceItem"></AddItems>
-            </ModalComponent>
+            @if (isModalVisible)
+            {
+                <ModalComponent Title="Add Items"
+                                OnClose="HandleModalClose">
+                    <AddItems InvoiceItem="@_invoiceItem"></AddItems>
+                </ModalComponent>
+            }
 
             <div class="container mt-2 pt-2 overflow-auto" style="background-color: #F9F4F8; height: 100%;">
-                @if (InvoiceID == null && _invoice.InvoiceItems == null)
+                @if (InvoiceID == null && _invoice.InvoiceItems.Count == 0)
                 {
                     <div class="text-center">
-                        <h4 class="fw-bold h2">Add Items</h4>
+                        <h4 class="fw-bold h2">No Items</h4>
                     </div>
                 }
                 else
@@ -93,24 +102,17 @@
                                         <strong>Date: </strong>
                                         <em>@_invoice.DateTimeInssured.ToString("dd-MM-yyyy | hh:mm tt")</em>
                                     </p>
-                                    @if (_invoice.Customer != null)
+                                    @if (_customer != null)
                                     {
                                         <p>
-                                            <strong>Code - @_invoice.Customer.Code</strong>
+                                            <strong>@_customer.Code - @_customer.Name</strong>
                                         </p>
                                     }
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="text-center">
-                                    @if (_invoice.Code != null)
-                                    {
-                                        <h4>@_invoice.Code</h4>
-                                    }
-                                    else
-                                    {
-                                        <h4>Invoice</h4>
-                                    }
+                                    <h4>@(_invoice.Code ?? "Invoice Code")</h4>
                                 </div>
                                 <table class="table recieptbg">
                                     @* Invoice Head *@
@@ -130,28 +132,44 @@
                                             @foreach (var invoiceItem in _invoice.InvoiceItems)
                                             {
                                                 <tr>
-                                                    <td class="col-md-9"><p><em>@(invoiceItem.ItemID)</em></p></td>
+
+                                                    <td class="col-md-9">
+                                                        <p>
+                                                            <em>
+                                                                @(_items.Where(c => c.ItemID == invoiceItem.ItemID)
+                                                                    .Select(c => c.Name)
+                                                                    .FirstOrDefault())
+                                                            </em>
+                                                        </p>
+                                                    </td>
                                                     <td class="col-md-1" style="text-align: center"> @invoiceItem.Quantity </td>
                                                     <td class="col-md-1 text-center">@invoiceItem.Amount</td>
                                                     <td class="col-md-1 text-center">@invoiceItem.Total</td>
                                                 </tr>
                                                 @foreach (var invoiceItemTax in invoiceItem.InvoiceItemTaxes)
                                                 {
-
                                                     <tr>
                                                         <td>   </td>
-                                                        <td colspan="2" class="text-right"><p><strong>@(invoiceItemTax.TaxId)</strong></p></td>
-                                                        <td class="text-center text-danger"><p><strong>@invoiceItemTax.TaxAmount</strong></p></td>
+                                                        <td colspan="2" class="text-right">
+                                                            <p>
+                                                                <strong>
+                                                                    @(_taxes.Where(c => c.TaxID == invoiceItemTax.TaxId)
+                                                                        .Select(c => c.Name)
+                                                                        .FirstOrDefault())
+                                                                </strong>
+                                                            </p>
+                                                        </td>
+                                                        <td class="text-center"><p><strong>@invoiceItemTax.TaxAmount</strong></p></td>
                                                     </tr>
                                                 }
                                                 <tr>
                                                     <td>
-                                                        <button type="submit" class="btn btn-warning">
+                                                        <a type="submit" class="btn btn-warning">
                                                             <i class="bi bi-pencil-square"></i>
-                                                        </button>
-                                                        <button type="submit" class="btn btn-danger">
+                                                        </a>
+                                                        <a type="submit" class="btn btn-danger" @onclick="() => RemoveRow(invoiceItem)">
                                                             <i class="bi bi-trash"></i>
-                                                        </button>
+                                                        </a>
                                                     </td>
                                                     <td colspan="2" class="text-right"><p><strong>Net Amount: </strong></p></td>
                                                     <td class="text-center text-danger"><p><strong>@invoiceItem.ItemNetAmount</strong></p></td>
@@ -189,13 +207,14 @@
                 <i class="bi bi-file-earmark-plus-fill"></i> Save
             </button>
         }
-        <button class="btn btn-info mx-2">
+        <a class="btn btn-info mx-2">
             <i class="bi bi-printer-fill"></i> Print
-        </button>
+        </a>
         <NavLink href="/Invoice" class="btn btn-secondary">
             <i class="bi bi-arrow-return-right"></i> Back
         </NavLink>
     </div>
+
 </EditForm>
 
 @code {
@@ -204,24 +223,22 @@
     private List<InvoiceItemDTO> _invoiceItems = new List<InvoiceItemDTO>();
     private bool isModalVisible = false;
     private InvoiceItemDTO _invoiceItem = new InvoiceItemDTO();
+    private List<Customer> _customers = new List<Customer>();
+    private List<Item> _items = new List<Item>();
+    private List<Tax> _taxes = new List<Tax>();
+    private Customer _customer = new Customer();
 
     [Parameter]
     public int? InvoiceID { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
+        _customers = await invoiceService.GetCustomer(null);
+
         if (InvoiceID.HasValue)
         {
             _invoice = new InvoiceDTO();
-            var response = await Http.GetAsync($"api/Invoice/Form/{InvoiceID.Value}");
-            response.EnsureSuccessStatusCode();
-
-            var responseBody = await response.Content.ReadAsStringAsync();
-            _invoice = JsonSerializer.Deserialize<InvoiceDTO>(responseBody, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    ReferenceHandler = ReferenceHandler.Preserve
-                })!;
+            _invoice = await invoiceService.GetInvoiceById(InvoiceID);
             _invoiceItems = _invoice.InvoiceItems.Select(item => new InvoiceItemDTO
                 {
                     ItemID = item.ItemID,
@@ -233,6 +250,17 @@
                     Quantity = item.Quantity,
                     Amount = item.Amount,
                 }).ToList();
+            _customer = await invoiceService.GetCustomerById(_invoice.CustomerID);
+            foreach (var item in _invoice.InvoiceItems)
+            {
+                var _item = await invoiceService.GetItemById(item.ItemID);
+                _items.Add(_item);
+                foreach (var tax in item.InvoiceItemTaxes)
+                {
+                    var _tax = await invoiceService.GetTaxById(tax.TaxId);
+                    _taxes.Add(_tax);
+                }
+            }
         }
         else
         {
@@ -255,23 +283,13 @@
             _invoice.DateTimeInssured = DateTime.Now;
             await Save();
         }
-        StateHasChanged();
     }
 
     private async Task Save()
     {
         try
         {
-            var response = await Http.PostAsJsonAsync("api/Invoice/Form", _invoice);
-            if (response.IsSuccessStatusCode)
-            {
-                var newInvoice = await response.Content.ReadFromJsonAsync<Invoice>();
-            }
-            else
-            {
-                var errorMessage = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Error: {errorMessage}");
-            }
+            await invoiceService.SaveInvoice(_invoice);
         }
         catch (Exception ex)
         {
@@ -283,16 +301,7 @@
     {
         try
         {
-            var response = await Http.PutAsJsonAsync($"api/Invoice/Form/{InvoiceID}", _invoice);
-            if (response.IsSuccessStatusCode)
-            {
-                var newInvoice = await response.Content.ReadFromJsonAsync<Invoice>();
-            }
-            else
-            {
-                var errorMessage = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Error: {errorMessage}");
-            }
+            await invoiceService.UpdateInvoice(InvoiceID, _invoice);
         }
         catch (Exception ex)
         {
@@ -309,21 +318,25 @@
     {
         if (confirmed)
         {
-            if (_invoice.InvoiceItems == null)
-            {
-                _invoice.InvoiceItems = new List<InvoiceItemDTO>()
-                {
-                    new InvoiceItemDTO(){
-
-                        InvoiceItemTaxes = new List<InvoiceItemTaxDTO>()
-                    },
-                };
-            }
             _invoice.InvoiceItems.Add(_invoiceItem);
+            foreach (var item in _invoice.InvoiceItems)
+            {
+                var _item = await invoiceService.GetItemById(item.ItemID);
+                _items.Add(_item);
+                foreach (var tax in item.InvoiceItemTaxes)
+                {
+                    var _tax = await invoiceService.GetTaxById(tax.TaxId);
+                    _taxes.Add(_tax);
+                }
+            }
             _invoiceItem = new InvoiceItemDTO();
-            StateHasChanged();
         }
         isModalVisible = false;
+    }
+
+    private void RemoveRow(InvoiceItemDTO row)
+    {
+        _invoice.InvoiceItems.Remove(row);
     }
 }
 

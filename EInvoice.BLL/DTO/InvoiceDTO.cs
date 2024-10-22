@@ -21,9 +21,9 @@ namespace EInvoice.BLL.DTO
         public DateTime DateTimeInssured { get; set; }
 
         public int CustomerID { get; set; }
-        public CustomerDTO Customer { get; set; }
+        //public CustomerDTO Customer { get; set; }
 
-        public ICollection<InvoiceItemDTO> InvoiceItems { get; set; }
+        public List<InvoiceItemDTO> InvoiceItems { get; set; } = [];
 
         public decimal NetAmount => InvoiceItems?.Sum(ii => ii.ItemNetAmount) ?? 0;
 
