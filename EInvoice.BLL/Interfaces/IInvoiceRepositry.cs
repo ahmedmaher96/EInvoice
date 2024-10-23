@@ -12,8 +12,6 @@ namespace EInvoice.BLL.Interfaces
     {
         // Signatures
 
-        #region Invoice
-
         IQueryable<Invoice> Query();
 
         Task<IEnumerable<Invoice>> GetAllAsync();
@@ -27,8 +25,6 @@ namespace EInvoice.BLL.Interfaces
         Task<Invoice> UpdateInvoiceAsync(Invoice invoice);
 
         void DeleteInvoice(int invoiceId);
-
-        #endregion
 
     }
 }

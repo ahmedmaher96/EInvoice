@@ -86,6 +86,11 @@ namespace EInvoice.BLL.Repositries
 
 
             var invoice = _mapper.Map<Invoice>(invoicedto);
+            
+            bool existedCode = await CheckCodeDuplication(invoice);
+            if (existedCode)
+                throw new Exception("Code Already Existed.");
+
             Context.Invoices.Add(invoice);
             await Context.SaveChangesAsync();
             return invoice;
@@ -93,6 +98,10 @@ namespace EInvoice.BLL.Repositries
 
         public async Task<Invoice> UpdateInvoiceAsync(Invoice invoice)
         {
+            bool existedCode = await CheckCodeDuplication(invoice);
+            if (existedCode)
+                throw new Exception("Code Already Existed.");
+
             Context.Invoices.Update(invoice);
             await Context.SaveChangesAsync();
             return invoice;
@@ -147,6 +156,18 @@ namespace EInvoice.BLL.Repositries
         }
 
         #endregion
+
+        #endregion
+
+        #region Methods
+
+        public async Task<bool> CheckCodeDuplication(Invoice invoice)
+        {
+            
+            bool isExisted = await Query().AnyAsync(e => e.Code.Contains(invoice.Code));
+
+            return isExisted;
+        }
 
         #endregion
     }

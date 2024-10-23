@@ -4,6 +4,7 @@ using EInvoice.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EInvoice.DAL.Migrations
 {
     [DbContext(typeof(EInvoiceDBContext))]
-    partial class EInvoiceDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241023072952_SecondMigration")]
+    partial class SecondMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,7 +59,7 @@ namespace EInvoice.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CustomerID")
+                    b.Property<int?>("CustomerID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateTimeInssured")
@@ -89,6 +92,10 @@ namespace EInvoice.DAL.Migrations
                     b.Property<int?>("ItemId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -117,6 +124,10 @@ namespace EInvoice.DAL.Migrations
 
                     b.Property<int?>("TaxId")
                         .HasColumnType("int");
+
+                    b.Property<string>("TaxName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("InvoiceItemTaxID");
 
@@ -176,8 +187,7 @@ namespace EInvoice.DAL.Migrations
                     b.HasOne("EInvoice.DAL.Models.Customer", "Customer")
                         .WithMany("Invoices")
                         .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Customer");
                 });
@@ -192,7 +202,7 @@ namespace EInvoice.DAL.Migrations
                     b.HasOne("EInvoice.DAL.Models.Item", "Item")
                         .WithMany("InvoiceItems")
                         .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Invoice");
 
@@ -209,7 +219,7 @@ namespace EInvoice.DAL.Migrations
                     b.HasOne("EInvoice.DAL.Models.Tax", "Tax")
                         .WithMany("InvoiceItemTaxes")
                         .HasForeignKey("TaxId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("InvoiceItem");
 

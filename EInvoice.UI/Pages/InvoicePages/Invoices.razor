@@ -22,7 +22,7 @@
         </div>
         <div class="my-2">
             <select @bind="searchParameters.Type" class="form-select">
-                <option value="">Select Type</option>
+                <option value="0">Select Type</option>
                 @foreach (var type in Enum.GetValues(typeof(InvoiceType)))
                 {
                     <option value="@((int)type)">@type.ToString()</option>

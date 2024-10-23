@@ -21,7 +21,6 @@ namespace EInvoice.BLL.DTO
         public DateTime DateTimeInssured { get; set; }
 
         public int CustomerID { get; set; }
-        //public CustomerDTO Customer { get; set; }
 
         public List<InvoiceItemDTO> InvoiceItems { get; set; } = [];
 

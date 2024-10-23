@@ -8,8 +8,6 @@ namespace EInvoice.API.Helpers
     {
         public MappingProfiles()
         {
-            //CreateMap<model,modeldto>()
-            //          .Formember(property,MapFrom(where to find it));
             CreateMap<Item, ItemDTO>().ReverseMap();
             CreateMap<Customer, CustomerDTO>().ReverseMap();
             CreateMap<Tax, TaxDTO>().ReverseMap();

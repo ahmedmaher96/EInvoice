@@ -19,7 +19,6 @@ namespace EInvoice.BLL.DTO
         public int Quantity { get; set; }
 
         public int ItemID { get; set; }
-        //public ItemDTO Item { get; set; }
 
         public List<InvoiceItemTaxDTO> InvoiceItemTaxes { get; set; } = [];
 

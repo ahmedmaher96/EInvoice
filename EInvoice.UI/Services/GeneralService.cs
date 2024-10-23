@@ -6,8 +6,7 @@ namespace EInvoice.UI.Services
 {
     public class GeneralService
     {
-        #region Properties
-
+        
         #region Properties
 
         public Item Item { get; private set; }
@@ -39,7 +38,6 @@ namespace EInvoice.UI.Services
             Invoice = invoice;
         }
 
-        #endregion
         #endregion
 
     }

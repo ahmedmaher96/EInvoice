@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -43,7 +44,7 @@ namespace EInvoice.BLL.Repositries.Generic
         public async Task<IEnumerable<T>> GetList(string filterCode, string filterName)
         {
             return await Query()
-                        .Where(e => EF.Property<string>(e, "Name").Contains(filterName) 
+                        .Where(e => EF.Property<string>(e, "Name").Contains(filterName)
                         || EF.Property<string>(e, "Code").Contains(filterCode))
                         .ToListAsync();
         }
@@ -59,12 +60,20 @@ namespace EInvoice.BLL.Repositries.Generic
 
         public async Task AddAsync(T entity)
         {
+            bool isExisted = await CheckCodeDuplication(entity);
+            if (isExisted)
+                throw new Exception("Code is existed already.");
+
             await Context.Set<T>().AddAsync(entity);
             await Context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(T entity)
         {
+            bool isExisted = await CheckCodeDuplication(entity);
+            if (isExisted)
+                throw new Exception("Code is existed already.");
+
             Context.Set<T>().Update(entity);
             await Context.SaveChangesAsync();
         }
@@ -82,5 +91,24 @@ namespace EInvoice.BLL.Repositries.Generic
         #endregion
 
         #endregion
+
+        #region Methods
+
+        public async Task<bool> CheckCodeDuplication(T entity)
+        {
+            var codeProperty = typeof(T).GetProperty("Code");
+            if (codeProperty == null)
+            {
+                throw new Exception("The entity does not have a Code property.");
+            }
+
+            string codeValue = (string)codeProperty.GetValue(entity);
+            bool isExisted = await Query().AnyAsync(e => EF.Property<string>(e, "Code").Contains(codeValue));
+            
+            return isExisted;
+        }
+
+        #endregion
+
     }
 }

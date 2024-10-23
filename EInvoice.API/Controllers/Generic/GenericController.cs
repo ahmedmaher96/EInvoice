@@ -26,7 +26,7 @@ namespace EInvoice.API.Controllers.Generic
 
         #endregion
 
-        #region Actions
+        #region End Points
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TModel>>> GetElements([FromQuery] string? filterCode = null, string? filterName = null)

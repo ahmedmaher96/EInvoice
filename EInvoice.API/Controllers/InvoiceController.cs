@@ -34,8 +34,6 @@ namespace EInvoice.API.Controllers
 
         #region End Points
 
-        #region Invoice Endpoints
-
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Invoice>>> GetAllInvoices([FromQuery] string? Code = null, InvoiceType? type = null, DateTime? dateTime = null)
         {
@@ -102,8 +100,5 @@ namespace EInvoice.API.Controllers
         }
 
         #endregion
-
-        #endregion
-
     }
 }

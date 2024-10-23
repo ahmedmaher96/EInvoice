@@ -30,8 +30,9 @@ namespace EInvoice.DAL.Models
         public DateTime DateTimeInssured { get; set; }
 
         #region Navigational Properties
-
-        public int? CustomerID { get; set; }
+        
+        [Required(ErrorMessage = "Customer is required")]
+        public int CustomerID { get; set; }
         public Customer Customer { get; set; }
 
         public List<InvoiceItem> InvoiceItems { get; set; }

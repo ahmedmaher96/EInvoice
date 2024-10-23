@@ -3,6 +3,7 @@
 @inject HttpClient Http
 @inject GeneralService service
 @inject InvoiceService invoiceService
+@inject IJSRuntime JS
 
 <h3>Invoice Form</h3>
 
@@ -11,6 +12,9 @@
     <ValidationSummary />
 
     <div class="row">
+
+        @* Invoice Data Inputs *@
+
         <div class="col-lg-4 border-end border-1 border-dark">
             <div class="my-3 text-center">
                 <label>
@@ -62,9 +66,11 @@
             }
         </div>
 
-
+        @* Invoice *@
 
         <div class="col-lg-8" style="height: 70vh;">
+
+            @* Add Item Modal Start*@
 
             <div class="text-end">
                 <a class="btn btn-success bi-file-earmark-plus-fill" @onclick="ShowModal"> Add Items</a>
@@ -72,13 +78,15 @@
 
             @if (isModalVisible)
             {
-                <ModalComponent Title="Add Items"
+                <ModalComponent Title="Add Item"
                                 OnClose="HandleModalClose">
                     <AddItems InvoiceItem="@_invoiceItem"></AddItems>
                 </ModalComponent>
             }
 
-            <div class="container mt-2 pt-2 overflow-auto" style="background-color: #F9F4F8; height: 100%;">
+            @* Add Item Modal End*@
+
+            <div class="container mt-2 pt-2 overflow-auto" style="background-color: #F9F4F8; height: 100%;" id="printSection">
                 @if (InvoiceID == null && _invoice.InvoiceItems.Count == 0)
                 {
                     <div class="text-center">
@@ -164,10 +172,10 @@
                                                 }
                                                 <tr>
                                                     <td>
-                                                        <a type="submit" class="btn btn-warning">
+                                                        <a class="btn btn-warning" @onclick="()=>EditInvoiceItem(invoiceItem)">
                                                             <i class="bi bi-pencil-square"></i>
                                                         </a>
-                                                        <a type="submit" class="btn btn-danger" @onclick="() => RemoveRow(invoiceItem)">
+                                                        <a class="btn btn-danger" @onclick="() => RemoveRow(invoiceItem)">
                                                             <i class="bi bi-trash"></i>
                                                         </a>
                                                     </td>
@@ -193,6 +201,8 @@
 
     </div>
 
+    @* Control Buttons *@
+
     <div class="text-start">
         @if (InvoiceID.HasValue)
         {
@@ -207,7 +217,7 @@
                 <i class="bi bi-file-earmark-plus-fill"></i> Save
             </button>
         }
-        <a class="btn btn-info mx-2">
+        <a class="btn btn-info mx-2" @onclick="PrintInvoice">
             <i class="bi bi-printer-fill"></i> Print
         </a>
         <NavLink href="/Invoice" class="btn btn-secondary">
@@ -215,7 +225,23 @@
         </NavLink>
     </div>
 
+
 </EditForm>
+
+<script>
+    function printInvoice() {
+        var printContents = document.getElementById("printSection").innerHTML;
+        var tempDiv = document.createElement("div");
+        tempDiv.innerHTML = printContents;
+        var buttons = tempDiv.querySelectorAll("button, a.btn");
+        buttons.forEach(button => button.style.display = "none");
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = tempDiv.innerHTML;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();
+    }
+</script>
 
 @code {
 
@@ -230,6 +256,9 @@
 
     [Parameter]
     public int? InvoiceID { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -251,21 +280,14 @@
                     Amount = item.Amount,
                 }).ToList();
             _customer = await invoiceService.GetCustomerById(_invoice.CustomerID);
-            foreach (var item in _invoice.InvoiceItems)
-            {
-                var _item = await invoiceService.GetItemById(item.ItemID);
-                _items.Add(_item);
-                foreach (var tax in item.InvoiceItemTaxes)
-                {
-                    var _tax = await invoiceService.GetTaxById(tax.TaxId);
-                    _taxes.Add(_tax);
-                }
-            }
+            
+            await GetInvoiceItemTaxNamesById();
         }
         else
         {
             _invoice = new InvoiceDTO()
                 {
+                    Code = GenerateInvoiceCode(),
                     DateTimeInssured = DateTime.Now,
                 };
         }
@@ -283,12 +305,14 @@
             _invoice.DateTimeInssured = DateTime.Now;
             await Save();
         }
+        NavigateToItemList();
     }
 
     private async Task Save()
     {
         try
         {
+            _invoice.Code ??= GenerateInvoiceCode();
             await invoiceService.SaveInvoice(_invoice);
         }
         catch (Exception ex)
@@ -318,17 +342,20 @@
     {
         if (confirmed)
         {
-            _invoice.InvoiceItems.Add(_invoiceItem);
-            foreach (var item in _invoice.InvoiceItems)
+            var existingItem = _invoice.InvoiceItems.FirstOrDefault(i => i.ItemID == _invoiceItem.ItemID);
+
+            if (existingItem != null)
             {
-                var _item = await invoiceService.GetItemById(item.ItemID);
-                _items.Add(_item);
-                foreach (var tax in item.InvoiceItemTaxes)
-                {
-                    var _tax = await invoiceService.GetTaxById(tax.TaxId);
-                    _taxes.Add(_tax);
-                }
+                var index = _invoice.InvoiceItems.IndexOf(existingItem);
+                _invoice.InvoiceItems[index] = _invoiceItem;
             }
+            else
+            {
+                _invoice.InvoiceItems.Add(_invoiceItem);
+            }
+
+            await GetInvoiceItemTaxNamesById();
+
             _invoiceItem = new InvoiceItemDTO();
         }
         isModalVisible = false;
@@ -337,6 +364,49 @@
     private void RemoveRow(InvoiceItemDTO row)
     {
         _invoice.InvoiceItems.Remove(row);
+    }
+
+    private void EditInvoiceItem(InvoiceItemDTO row)
+    {
+        isModalVisible = true;
+        _invoiceItem = row;
+    }
+
+    private string GenerateInvoiceCode()
+    {
+        var random = new Random();
+
+        string digits = random.Next(1000, 9999).ToString();
+
+        string letters = new string(Enumerable.Range(0, 4)
+            .Select(_ => (char)random.Next('A', 'Z' + 1)).ToArray());
+
+        return $"#{digits}{letters}";
+    }
+
+    private async Task PrintInvoice()
+    {
+        await JS.InvokeVoidAsync("printInvoice");
+    }
+
+    private void NavigateToItemList()
+    {
+        NavigationManager.NavigateTo($"/Invoice");
+        StateHasChanged();
+    }
+
+    private async Task GetInvoiceItemTaxNamesById()
+    {
+        foreach (var item in _invoice.InvoiceItems)
+        {
+            var _item = await invoiceService.GetItemById(item.ItemID);
+            _items.Add(_item);
+            foreach (var tax in item.InvoiceItemTaxes)
+            {
+                var _tax = await invoiceService.GetTaxById(tax.TaxId);
+                _taxes.Add(_tax);
+            }
+        }
     }
 }
 
